@@ -678,6 +678,41 @@
             color: var(--accent-gold);
             z-index: 999;
         }
+
+        .batch-area {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .file-actions button {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--accent-gold);
+            padding: 10px;
+            border-radius: 25px;
+            color: var(--accent-gold);
+            cursor: pointer;
+        }
+
+        .batch-textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid #3a3a3a;
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-family: monospace;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -755,6 +790,7 @@
                             <li>🎵 تنفيذ أوامر مثل: <code>افتح يوتيوب</code>، <code>شغل فيروز</code>، <code>طقس بيروت</code></li>
                             <li>📝 تنسيق النصوص باحترافية (عناوين، قوائم، أكواد)</li>
                             <li>⏰ تذكيرك بالمواعيد المهمة</li>
+                            <li>🔍 البحث في Google عندما لا أعرف الإجابة</li>
                         </ul>
                         <p><strong>💬 ماذا تريد أن تفعل اليوم؟</strong></p>
                     </div>
@@ -770,9 +806,30 @@
                     <div class="image-preview-area" id="teachImagePreview"></div>
                     <button class="teach-btn" onclick="teachCloud()">📤 تعليم للسحابة</button>
                 </div>
+                
+                <!-- منطقة الاستيراد/التصدير والإضافة المتعددة -->
+                <div class="batch-area">
+                    <h4 style="color: var(--accent-gold); margin-bottom: 10px;">📁 استيراد/تصدير المعلومات</h4>
+                    <div class="file-actions">
+                        <button onclick="exportKnowledge()">📤 تصدير كل المعلومات (JSON)</button>
+                        <button onclick="document.getElementById('importFile').click()">📥 استيراد معلومات (JSON)</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importKnowledge(this)">
+                    </div>
+                    
+                    <h4 style="color: var(--accent-gold); margin: 15px 0 10px 0;">✏️ إضافة متعددة دفعة واحدة</h4>
+                    <textarea id="batchQuestions" class="batch-textarea" rows="6" placeholder="أدخل الأسئلة والأجوبة بهذا التنسيق:
+ما هو HTML؟||لغة ترميز النصوص
+ما هو CSS؟||لغة تنسيق المواقع
+ما هو JavaScript؟||لغة برمجة المواقع
+
+(كل سطر: سؤال||جواب)"></textarea>
+                    <button class="teach-btn" onclick="addBatchKnowledge()">➕ إضافة الكل دفعة واحدة</button>
+                </div>
+                
                 <div style="font-size: 12px; color: #666; margin-top: 10px; text-align: center;">
                     🌍 أي معلومة تعلمها تصبح متاحة لكل المستخدمين<br>
-                    ✨ يمكنك استخدام Markdown في الإجابات: **عريض**، *مائل*، # عناوين، - قوائم
+                    ✨ يمكنك استخدام Markdown في الإجابات: **عريض**، *مائل*، # عناوين، - قوائم<br>
+                    📁 ملف JSON المدعوم: [{&quot;question&quot;: &quot;س1&quot;, &quot;answer&quot;: &quot;ج1&quot;}, ...]
                 </div>
             </div>
 
@@ -883,6 +940,149 @@
             }
             
             return formatted;
+        }
+        
+        // ========== البحث في Google ==========
+        function searchGoogle(query) {
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+        }
+        
+        // ========== دوال الاستيراد والتصدير والإضافة المتعددة ==========
+        
+        // تصدير كل المعلومات إلى ملف JSON
+        function exportKnowledge() {
+            const exportData = Object.keys(knowledgeBase).map(question => ({
+                question: question,
+                answer: knowledgeBase[question].answer,
+                image: knowledgeBase[question].image || null
+            }));
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cerebonix_knowledge_${new Date().toISOString().slice(0,19)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`📁 تم تصدير ${exportData.length} معلومة`);
+        }
+        
+        // استيراد معلومات من ملف JSON
+        async function importKnowledge(input) {
+            if (!isTeacher) {
+                showToast('⛔ فقط المعلم يمكنه استيراد المعلومات');
+                return;
+            }
+            
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (!Array.isArray(importedData)) {
+                        showToast('❌ الملف يجب أن يكون مصفوفة من الأسئلة والأجوبة');
+                        return;
+                    }
+                    
+                    let successCount = 0;
+                    let failCount = 0;
+                    
+                    addMessage(`📥 جاري استيراد ${importedData.length} معلومة...`, 'bot');
+                    
+                    for (const item of importedData) {
+                        if (item.question && item.answer) {
+                            try {
+                                await db.collection('publicKnowledge').doc(item.question).set({
+                                    answer: item.answer,
+                                    image: item.image || null,
+                                    taughtBy: currentUser.name,
+                                    taughtAt: new Date().toISOString(),
+                                    imported: true
+                                });
+                                knowledgeBase[item.question] = { answer: item.answer, image: item.image || null };
+                                successCount++;
+                            } catch(err) {
+                                failCount++;
+                            }
+                        } else {
+                            failCount++;
+                        }
+                    }
+                    
+                    updateStats();
+                    displayKnowledgeList();
+                    addMessage(`✅ **تم استيراد ${successCount} معلومة** بنجاح${failCount > 0 ? `، فشل ${failCount}` : ''}`, 'bot');
+                    showToast(`✅ استيراد: ${successCount} نجاح، ${failCount} فشل`);
+                    
+                } catch(err) {
+                    showToast('❌ خطأ في قراءة الملف: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+        
+        // إضافة مجموعة من الأسئلة والأجوبة دفعة واحدة
+        async function addBatchKnowledge() {
+            if (!isTeacher) {
+                showToast('⛔ فقط المعلم يمكنه إضافة المعلومات');
+                return;
+            }
+            
+            const batchText = document.getElementById('batchQuestions').value.trim();
+            if (!batchText) {
+                showToast('⚠️ الرجاء إدخال الأسئلة والأجوبة');
+                return;
+            }
+            
+            const lines = batchText.split('\n');
+            const items = [];
+            
+            for (const line of lines) {
+                if (line.trim() && line.includes('||')) {
+                    const [question, answer] = line.split('||');
+                    if (question.trim() && answer.trim()) {
+                        items.push({ question: question.trim(), answer: answer.trim() });
+                    }
+                }
+            }
+            
+            if (items.length === 0) {
+                showToast('⚠️ لم يتم العثور على بيانات صالحة. استخدم التنسيق: سؤال||جواب');
+                return;
+            }
+            
+            let successCount = 0;
+            let failCount = 0;
+            
+            addMessage(`📚 جاري إضافة ${items.length} معلومة دفعة واحدة...`, 'bot');
+            
+            for (const item of items) {
+                try {
+                    await db.collection('publicKnowledge').doc(item.question).set({
+                        answer: item.answer,
+                        image: null,
+                        taughtBy: currentUser.name,
+                        taughtAt: new Date().toISOString(),
+                        batch: true
+                    });
+                    knowledgeBase[item.question] = { answer: item.answer, image: null };
+                    successCount++;
+                } catch(err) {
+                    failCount++;
+                }
+            }
+            
+            updateStats();
+            displayKnowledgeList();
+            addMessage(`✅ **تم إضافة ${successCount} معلومة** بنجاح${failCount > 0 ? `، فشل ${failCount}` : ''}`, 'bot');
+            
+            if (successCount > 0) {
+                document.getElementById('batchQuestions').value = '';
+            }
         }
         
         // ========== تنفيذ الأوامر ==========
@@ -1126,14 +1326,14 @@
             if (result) {
                 addMessage(result.answer, 'bot', { image: result.image });
             } else {
-                addMessage(`📚 لم أتعلم هذا بعد يا ${currentUser?.name || 'صديقي'}.
+                // البحث في Google تلقائياً
+                searchGoogle(msg);
+                addMessage(`🔍 **لم أتعلم "${msg}" بعد يا ${currentUser?.name || 'صديقي'}!**
 
-**💡 اقتراحات:**
-- اسأل بطريقة مختلفة
-- اطلب من المعلم إضافة هذه المعلومة
-- جرب كتابة \`مساعدة\` لمعرفة الأوامر المتاحة
+سأذهب إلى **Google** لأبحث لك عن إجابة.
+🔄 سيتم فتح نافذة البحث تلقائياً.
 
-هذه المعلومات غير موجودة حالياً في قاعدة المعرفة.`, 'bot');
+**💡 نصيحة:** اطلب من المعلم إضافة هذه المعلومة إلى قاعدة المعرفة لتكون متاحة للجميع في المستقبل.`, 'bot');
             }
         }
         
@@ -1268,12 +1468,9 @@
             }
         }
         
-        // ========== دوال المستخدم مع حفظ الجلسة بشكل صحيح ==========
-        
-        // حفظ الجلسة بالكامل
+        // ========== دوال المستخدم مع حفظ الجلسة ==========
         function saveSession() {
             if (currentUser) {
-                // حفظ بيانات المستخدم
                 const userToSave = {
                     email: currentUser.email,
                     name: currentUser.name,
@@ -1283,28 +1480,15 @@
                 };
                 localStorage.setItem('cerebonix_user', JSON.stringify(userToSave));
                 
-                // حفظ التذكيرات بشكل منفصل
                 if (reminders.length > 0) {
                     localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
                 }
                 
-                // حفظ علامة أن الجلسة نشطة
                 localStorage.setItem('cerebonix_session_active', 'true');
                 localStorage.setItem('cerebonix_last_active', new Date().toISOString());
-                
-                // إظهار مؤشر للمستخدم
-                const badge = document.getElementById('autoLoginBadge');
-                if (badge) {
-                    badge.textContent = '🔐 تم حفظ جلستك';
-                    badge.style.opacity = '0.7';
-                    setTimeout(() => {
-                        badge.style.opacity = '0';
-                    }, 3000);
-                }
             }
         }
         
-        // استعادة الجلسة المحفوظة
         async function restoreSavedSession() {
             const savedUserStr = localStorage.getItem('cerebonix_user');
             const sessionActive = localStorage.getItem('cerebonix_session_active');
@@ -1313,21 +1497,17 @@
                 try {
                     const savedUser = JSON.parse(savedUserStr);
                     
-                    // التحقق من صلاحية الجلسة (مثلاً 30 يوم)
                     const lastActive = localStorage.getItem('cerebonix_last_active');
                     if (lastActive) {
                         const lastActiveDate = new Date(lastActive);
                         const now = new Date();
                         const daysDiff = (now - lastActiveDate) / (1000 * 60 * 60 * 24);
-                        
-                        // إذا مر أكثر من 30 يوم، نطلب إعادة تسجيل دخول
                         if (daysDiff > 30) {
                             localStorage.removeItem('cerebonix_session_active');
                             return false;
                         }
                     }
                     
-                    // استعادة المستخدم
                     currentUser = {
                         email: savedUser.email,
                         name: savedUser.name,
@@ -1338,7 +1518,6 @@
                     
                     isTeacher = currentUser.isTeacher || (currentUser.email === TEACHER_EMAIL);
                     
-                    // استعادة التذكيرات
                     const savedReminders = localStorage.getItem(`cerebonix_reminders_${currentUser.email}`);
                     if (savedReminders) {
                         try {
@@ -1347,16 +1526,13 @@
                         } catch(e) {}
                     }
                     
-                    // تحديث شاشة الدخول بالبيانات المحفوظة
                     if (!currentUser.isGuest) {
                         document.getElementById('userEmail').value = currentUser.email;
                         document.getElementById('userName').value = currentUser.name;
                         document.getElementById('rememberMe').checked = true;
                     }
                     
-                    // تسجيل الدخول التلقائي
                     await completeLogin();
-                    
                     showToast('👋 مرحباً بعودتك! تم تسجيل الدخول تلقائياً');
                     return true;
                     
@@ -1409,7 +1585,6 @@
             };
             isTeacher = false;
             
-            // حفظ جلسة الزائر
             saveSession();
             await completeLogin();
         }
@@ -1417,7 +1592,6 @@
         async function completeLogin() {
             reminders = currentUser.reminders || [];
             
-            // تحميل التذكيرات المحفوظة
             if (!currentUser.isGuest && localStorage.getItem(`cerebonix_reminders_${currentUser.email}`)) {
                 try {
                     const savedReminders = JSON.parse(localStorage.getItem(`cerebonix_reminders_${currentUser.email}`));
@@ -1453,9 +1627,11 @@
 **✨ صلاحياتك الخاصة:**
 - ✅ إضافة معلومات جديدة إلى قاعدة المعرفة
 - ✅ تعديل وحذف المعلومات الموجودة
+- ✅ **استيراد/تصدير ملفات JSON** 📁
+- ✅ **إضافة متعددة دفعة واحدة** 📝
 - ✅ الوصول إلى لوحة التحكم الكاملة
 
-**💡 نصيحة:** استخدم Markdown لتنسيق الإجابات وجعلها أكثر احترافية!`, 'bot');
+**💡 نصيحة:** يمكنك الآن إضافة عدة أسئلة وأجوبة دفعة واحدة!`, 'bot');
             } else {
                 addMessage(`# 👋 مرحباً ${currentUser.name}!
 
@@ -1466,6 +1642,7 @@
 - 🎵 استخدام الأوامر مثل "افتح يوتيوب" أو "شغل أغنية"
 - ⏰ إضافة تذكيرات للمواعيد المهمة
 - 📝 كتابة \`مساعدة\` لمعرفة جميع الأوامر
+- 🔍 **عندما لا أعرف الإجابة، سأبحث لك في Google تلقائياً!**
 
 **ماذا تريد أن تسأل اليوم؟**`, 'bot');
             }
@@ -1486,7 +1663,6 @@
                 localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
             }
             
-            // مسح جلسة المستخدم الحالي فقط
             localStorage.removeItem('cerebonix_session_active');
             if (currentUser && !currentUser.isGuest) {
                 localStorage.removeItem('cerebonix_user');
@@ -1684,24 +1860,20 @@
         
         // ========== بدء التطبيق واستعادة الجلسة ==========
         document.addEventListener('DOMContentLoaded', async () => {
-            // محاولة استعادة الجلسة المحفوظة
             const restored = await restoreSavedSession();
             
             if (!restored) {
-                // إذا لم توجد جلسة محفوظة، نظهر شاشة الدخول
                 document.getElementById('loginScreen').style.display = 'block';
                 document.getElementById('mainScreen').classList.add('hidden');
             }
         });
         
-        // حفظ الجلسة بشكل دوري (كل دقيقة)
         setInterval(() => {
             if (currentUser) {
                 saveSession();
             }
         }, 60000);
         
-        // حفظ الجلسة قبل إغلاق الصفحة
         window.addEventListener('beforeunload', () => {
             if (currentUser) {
                 saveSession();
