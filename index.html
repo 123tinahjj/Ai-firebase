@@ -314,7 +314,6 @@
             gap: 15px;
         }
 
-        /* تنسيق محسن للرسائل */
         .message {
             display: flex;
             margin-bottom: 10px;
@@ -364,7 +363,6 @@
             border-bottom-right-radius: 5px;
         }
 
-        /* تنسيق النصوص داخل الرسائل */
         .message-bubble h1, .message-bubble h2, .message-bubble h3 {
             margin: 10px 0;
             color: var(--accent-gold);
@@ -627,7 +625,6 @@
             30% { transform: translateY(-10px); }
         }
 
-        /* شريط التمرير المخصص */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -661,7 +658,6 @@
             }
         }
 
-        /* وضع عدم الإزعاج للتذكيرات */
         .reminder-badge {
             background: var(--accent-gold);
             color: #000;
@@ -670,10 +666,23 @@
             font-size: 10px;
             margin-right: 5px;
         }
+        
+        .auto-login-badge {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            color: var(--accent-gold);
+            z-index: 999;
+        }
     </style>
 </head>
 <body>
     <div class="background-gradient"></div>
+    <div class="auto-login-badge" id="autoLoginBadge"></div>
 
     <!-- شاشة الدخول -->
     <div class="login-premium" id="loginScreen">
@@ -700,7 +709,7 @@
 
         <div class="input-premium">
             <label>
-                <input type="checkbox" id="rememberMe" checked> تذكرني
+                <input type="checkbox" id="rememberMe" checked> تذكرني (حفظ الجلسة تلقائياً)
             </label>
         </div>
 
@@ -821,7 +830,6 @@
         let reminders = [];
         let isTeacher = false;
         let reminderInterval = null;
-        let sessionId = Date.now();
         
         // ========== الدوال المساعدة ==========
         function showToast(msg) {
@@ -842,12 +850,10 @@
         function formatMessage(text) {
             if (!text) return '';
             
-            // تحويل النص إلى Markdown مع دعم الكود
             let formatted = text;
             
             try {
                 if (typeof marked !== 'undefined') {
-                    // إعدادات marked للتنسيق المحسن
                     marked.setOptions({
                         highlight: function(code, lang) {
                             if (lang && hljs.getLanguage(lang)) {
@@ -862,7 +868,6 @@
                     });
                     formatted = marked.parse(text);
                 } else {
-                    // بديل بسيط
                     formatted = text
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                         .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -884,31 +889,26 @@
         async function executeCommand(command) {
             const cmd = command.toLowerCase().trim();
             
-            // فتح يوتيوب
             if (cmd.includes('افتح يوتيوب') || cmd === 'يوتيوب') {
                 window.open('https://www.youtube.com', '_blank');
                 return '✅ تم فتح YouTube';
             }
             
-            // فتح جوجل
             if (cmd.includes('افتح جوجل') || cmd === 'جوجل' || cmd.includes('google')) {
                 window.open('https://www.google.com', '_blank');
                 return '✅ تم فتح Google';
             }
             
-            // فتح فيسبوك
             if (cmd.includes('افتح فيسبوك') || cmd === 'فيسبوك') {
                 window.open('https://www.facebook.com', '_blank');
                 return '✅ تم فتح Facebook';
             }
             
-            // فتح تويتر
             if (cmd.includes('افتح تويتر') || cmd === 'تويتر' || cmd.includes('x')) {
                 window.open('https://twitter.com', '_blank');
                 return '✅ تم فتح Twitter';
             }
             
-            // تشغيل أغنية
             if (cmd.includes('شغل') || cmd.includes('شغّل')) {
                 let song = cmd.replace('شغل', '').replace('شغّل', '').replace('لي', '').replace('اغنية', '').trim();
                 if (song) {
@@ -918,29 +918,24 @@
                 return '🎵 على ماذا تريد أن تشغل؟ (مثال: شغل فيروز)';
             }
             
-            // الوقت
             if (cmd.includes('الوقت') || cmd.includes('الساعة')) {
                 const now = new Date();
                 return `🕐 الوقت الآن: ${now.toLocaleTimeString('ar-SA')}`;
             }
             
-            // التاريخ
             if (cmd.includes('التاريخ')) {
                 const now = new Date();
                 return `📅 اليوم: ${now.toLocaleDateString('ar-SA')}`;
             }
             
-            // معلومات عن المعلم
             if (cmd.includes('المعلم') || cmd.includes('من المعلم')) {
                 return `👨‍🏫 المعلم الرسمي للتطبيق: ${TEACHER_EMAIL}`;
             }
             
-            // معلومات عن قاعدة المعرفة
             if (cmd.includes('عدد المعلومات') || cmd.includes('كم معلومة')) {
                 return `📚 عدد المعلومات في قاعدة المعرفة: ${Object.keys(knowledgeBase).length} معلومة`;
             }
             
-            // الطقس (API تجريبي محسن)
             if (cmd.includes('طقس')) {
                 let city = cmd.replace('طقس', '').trim();
                 if (!city) city = 'cairo';
@@ -954,7 +949,6 @@
                 return `🌍 لم أتمكن من جلب طقس ${city}، حاول مرة أخرى`;
             }
             
-            // مساعدة
             if (cmd.includes('مساعدة') || cmd === 'help') {
                 return `# 📖 قائمة الأوامر المتاحة
 
@@ -991,7 +985,6 @@
                 displayKnowledgeList();
             } catch (error) {
                 console.error('خطأ:', error);
-                showToast('❌ خطأ في تحميل قاعدة المعرفة');
             }
         }
         
@@ -1045,10 +1038,8 @@
         }
         
         async function searchInCloud(question) {
-            // بحث دقيق
             if (knowledgeBase[question]) return knowledgeBase[question];
             
-            // بحث تقريبي
             for (let key in knowledgeBase) {
                 if (question.includes(key) || key.includes(question)) {
                     return knowledgeBase[key];
@@ -1088,7 +1079,6 @@
             chatArea.appendChild(msgDiv);
             chatArea.scrollTop = chatArea.scrollHeight;
             
-            // تطبيق تنسيق الكود على أي عناصر code
             if (typeof hljs !== 'undefined') {
                 msgDiv.querySelectorAll('pre code').forEach((block) => {
                     hljs.highlightElement(block);
@@ -1121,7 +1111,6 @@
             addMessage(msg, 'user');
             input.value = '';
             
-            // التحقق من الأوامر أولاً
             const commandResult = await executeCommand(msg);
             if (commandResult) {
                 setTimeout(() => addMessage(commandResult, 'bot'), 300);
@@ -1279,7 +1268,107 @@
             }
         }
         
-        // ========== دوال المستخدم مع حفظ الجلسة ==========
+        // ========== دوال المستخدم مع حفظ الجلسة بشكل صحيح ==========
+        
+        // حفظ الجلسة بالكامل
+        function saveSession() {
+            if (currentUser) {
+                // حفظ بيانات المستخدم
+                const userToSave = {
+                    email: currentUser.email,
+                    name: currentUser.name,
+                    isTeacher: currentUser.isTeacher,
+                    isGuest: currentUser.isGuest || false,
+                    lastLogin: new Date().toISOString()
+                };
+                localStorage.setItem('cerebonix_user', JSON.stringify(userToSave));
+                
+                // حفظ التذكيرات بشكل منفصل
+                if (reminders.length > 0) {
+                    localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
+                }
+                
+                // حفظ علامة أن الجلسة نشطة
+                localStorage.setItem('cerebonix_session_active', 'true');
+                localStorage.setItem('cerebonix_last_active', new Date().toISOString());
+                
+                // إظهار مؤشر للمستخدم
+                const badge = document.getElementById('autoLoginBadge');
+                if (badge) {
+                    badge.textContent = '🔐 تم حفظ جلستك';
+                    badge.style.opacity = '0.7';
+                    setTimeout(() => {
+                        badge.style.opacity = '0';
+                    }, 3000);
+                }
+            }
+        }
+        
+        // استعادة الجلسة المحفوظة
+        async function restoreSavedSession() {
+            const savedUserStr = localStorage.getItem('cerebonix_user');
+            const sessionActive = localStorage.getItem('cerebonix_session_active');
+            
+            if (savedUserStr && sessionActive === 'true') {
+                try {
+                    const savedUser = JSON.parse(savedUserStr);
+                    
+                    // التحقق من صلاحية الجلسة (مثلاً 30 يوم)
+                    const lastActive = localStorage.getItem('cerebonix_last_active');
+                    if (lastActive) {
+                        const lastActiveDate = new Date(lastActive);
+                        const now = new Date();
+                        const daysDiff = (now - lastActiveDate) / (1000 * 60 * 60 * 24);
+                        
+                        // إذا مر أكثر من 30 يوم، نطلب إعادة تسجيل دخول
+                        if (daysDiff > 30) {
+                            localStorage.removeItem('cerebonix_session_active');
+                            return false;
+                        }
+                    }
+                    
+                    // استعادة المستخدم
+                    currentUser = {
+                        email: savedUser.email,
+                        name: savedUser.name,
+                        isTeacher: savedUser.isTeacher || (savedUser.email === TEACHER_EMAIL),
+                        isGuest: savedUser.isGuest || false,
+                        reminders: []
+                    };
+                    
+                    isTeacher = currentUser.isTeacher || (currentUser.email === TEACHER_EMAIL);
+                    
+                    // استعادة التذكيرات
+                    const savedReminders = localStorage.getItem(`cerebonix_reminders_${currentUser.email}`);
+                    if (savedReminders) {
+                        try {
+                            reminders = JSON.parse(savedReminders);
+                            currentUser.reminders = reminders;
+                        } catch(e) {}
+                    }
+                    
+                    // تحديث شاشة الدخول بالبيانات المحفوظة
+                    if (!currentUser.isGuest) {
+                        document.getElementById('userEmail').value = currentUser.email;
+                        document.getElementById('userName').value = currentUser.name;
+                        document.getElementById('rememberMe').checked = true;
+                    }
+                    
+                    // تسجيل الدخول التلقائي
+                    await completeLogin();
+                    
+                    showToast('👋 مرحباً بعودتك! تم تسجيل الدخول تلقائياً');
+                    return true;
+                    
+                } catch(e) {
+                    console.error('خطأ في استعادة الجلسة:', e);
+                    localStorage.removeItem('cerebonix_session_active');
+                    return false;
+                }
+            }
+            return false;
+        }
+        
         async function login() {
             const email = document.getElementById('userEmail').value.trim();
             const password = document.getElementById('userPassword').value.trim();
@@ -1287,7 +1376,7 @@
             const rememberMe = document.getElementById('rememberMe').checked;
             
             if (!email || !password || !name) {
-                showToast('الرجاء إدخال جميع البيانات');
+                showToast('⚠️ الرجاء إدخال جميع البيانات');
                 return;
             }
             
@@ -1298,30 +1387,30 @@
                 name: name,
                 isTeacher: isTeacher,
                 reminders: [],
-                sessionId: sessionId,
+                isGuest: false,
                 lastLogin: new Date().toISOString()
             };
             
             if (rememberMe) {
-                localStorage.setItem('cerebonix_user', JSON.stringify(currentUser));
-                localStorage.setItem('cerebonix_session', sessionId.toString());
+                saveSession();
             }
+            
             await completeLogin();
         }
         
         async function loginAsGuest() {
             currentUser = {
-                email: 'guest@cerebonix.com',
+                email: 'guest_' + Date.now() + '@cerebonix.local',
                 name: 'زائر',
                 isTeacher: false,
                 reminders: [],
                 isGuest: true,
-                sessionId: sessionId,
                 lastLogin: new Date().toISOString()
             };
             isTeacher = false;
             
-            localStorage.setItem('cerebonix_guest', JSON.stringify({ name: 'زائر', sessionId: sessionId }));
+            // حفظ جلسة الزائر
+            saveSession();
             await completeLogin();
         }
         
@@ -1341,9 +1430,8 @@
             document.getElementById('mainScreen').classList.remove('hidden');
             
             document.getElementById('displayName').textContent = currentUser.name;
-            document.getElementById('displayEmail').textContent = currentUser.email;
+            document.getElementById('displayEmail').textContent = currentUser.isGuest ? 'زائر' : currentUser.email;
             
-            // تحديث الصورة الرمزية
             const avatarDiv = document.getElementById('userAvatar');
             if (currentUser.name) {
                 const initial = currentUser.name.charAt(0).toUpperCase();
@@ -1386,7 +1474,6 @@
             updateRemindersList();
             startReminderChecker();
             
-            // تحديث عدد المتصلين
             document.getElementById('onlineCount').textContent = Math.floor(Math.random() * 20) + 5;
         }
         
@@ -1398,9 +1485,15 @@
             if (currentUser && !currentUser.isGuest && reminders.length > 0) {
                 localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
             }
+            
+            // مسح جلسة المستخدم الحالي فقط
+            localStorage.removeItem('cerebonix_session_active');
             if (currentUser && !currentUser.isGuest) {
-                localStorage.setItem('cerebonix_user', JSON.stringify(currentUser));
+                localStorage.removeItem('cerebonix_user');
+            } else if (currentUser && currentUser.isGuest) {
+                localStorage.removeItem('cerebonix_user');
             }
+            
             currentUser = null;
             isTeacher = false;
             reminders = [];
@@ -1430,16 +1523,14 @@
                 });
                 if (currentUser) {
                     currentUser.reminders = reminders;
-                    if (!currentUser.isGuest) {
-                        localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
-                    }
+                    localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
                 }
                 updateRemindersList();
                 document.getElementById('reminderText').value = '';
                 document.getElementById('reminderTime').value = '';
                 addMessage(`✅ **تم إضافة تذكير:** "${text}" في ${new Date(time).toLocaleString('ar-SA')}`, 'bot');
             } else {
-                showToast('الرجاء إدخال نص التذكير والوقت');
+                showToast('⚠️ الرجاء إدخال نص التذكير والوقت');
             }
         }
         
@@ -1497,9 +1588,7 @@
             reminders = reminders.filter(r => r.id !== id);
             if (currentUser) {
                 currentUser.reminders = reminders;
-                if (!currentUser.isGuest) {
-                    localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
-                }
+                localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
             }
             updateRemindersList();
             showToast('✅ تم حذف التذكير');
@@ -1509,6 +1598,7 @@
             if (reminderInterval) clearInterval(reminderInterval);
             reminderInterval = setInterval(() => {
                 const now = new Date();
+                let hasNewReminder = false;
                 reminders.forEach(reminder => {
                     const reminderTime = new Date(reminder.time);
                     if (reminderTime <= now && !reminder.completed) {
@@ -1518,16 +1608,15 @@
 
 🕐 الوقت: ${reminderTime.toLocaleString('ar-SA')}`, 'bot');
                         reminder.completed = true;
+                        hasNewReminder = true;
                     }
                 });
-                if (currentUser) {
+                if (hasNewReminder && currentUser) {
                     currentUser.reminders = reminders;
-                    if (!currentUser.isGuest) {
-                        localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
-                    }
+                    localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
+                    updateRemindersList();
                 }
-                updateRemindersList();
-            }, 30000); // التحقق كل 30 ثانية
+            }, 30000);
         }
         
         // ========== دوال القائمة والصوت ==========
@@ -1593,41 +1682,30 @@
             recognition.start();
         }
         
-        // ========== تهيئة واستعادة الجلسة ==========
-        async function restoreSession() {
-            const savedUser = localStorage.getItem('cerebonix_user');
-            const savedSession = localStorage.getItem('cerebonix_session');
-            const savedGuest = localStorage.getItem('cerebonix_guest');
-            
-            if (savedUser && savedSession && savedSession === sessionId.toString()) {
-                try {
-                    const user = JSON.parse(savedUser);
-                    if (user.email && user.name) {
-                        document.getElementById('userEmail').value = user.email;
-                        document.getElementById('userName').value = user.name;
-                        // استعادة الجلسة تلقائياً
-                        currentUser = user;
-                        isTeacher = (user.email === TEACHER_EMAIL);
-                        await completeLogin();
-                        showToast('👋 مرحباً بعودتك!');
-                        return true;
-                    }
-                } catch(e) {}
-            } else if (savedGuest) {
-                try {
-                    const guest = JSON.parse(savedGuest);
-                    if (guest.sessionId === sessionId.toString()) {
-                        await loginAsGuest();
-                        return true;
-                    }
-                } catch(e) {}
-            }
-            return false;
-        }
-        
-        // ========== بدء التطبيق ==========
+        // ========== بدء التطبيق واستعادة الجلسة ==========
         document.addEventListener('DOMContentLoaded', async () => {
-            restoreSession();
+            // محاولة استعادة الجلسة المحفوظة
+            const restored = await restoreSavedSession();
+            
+            if (!restored) {
+                // إذا لم توجد جلسة محفوظة، نظهر شاشة الدخول
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('mainScreen').classList.add('hidden');
+            }
+        });
+        
+        // حفظ الجلسة بشكل دوري (كل دقيقة)
+        setInterval(() => {
+            if (currentUser) {
+                saveSession();
+            }
+        }, 60000);
+        
+        // حفظ الجلسة قبل إغلاق الصفحة
+        window.addEventListener('beforeunload', () => {
+            if (currentUser) {
+                saveSession();
+            }
         });
     </script>
 </body>
