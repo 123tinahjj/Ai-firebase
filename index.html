@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     
     <!-- Markdown Library -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -46,16 +47,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 10px;
             font-family: var(--font-family);
             margin: 0;
-        }
-
-        /* تحسين التصميم للهاتف والحاسوب */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
+            overflow: hidden;
         }
 
         .background-gradient {
@@ -77,21 +72,10 @@
             max-width: 500px;
             box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        /* تصميم الحاسوب */
-        @media (min-width: 1024px) {
-            .main-premium {
-                max-width: 1400px;
-                width: 95%;
-                height: 90vh;
-            }
         }
 
         .main-premium {
             max-width: 1400px;
-            width: 100%;
             height: 90vh;
             display: flex;
             flex-direction: column;
@@ -99,28 +83,22 @@
         }
 
         .login-premium {
-            padding: 40px;
+            padding: 30px;
             max-height: 90vh;
             overflow-y: auto;
         }
 
-        @media (max-width: 768px) {
-            .login-premium {
-                padding: 25px;
-            }
-        }
-
         .premium-logo {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .logo-icon {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
-            border-radius: 35px;
-            margin: 0 auto 20px;
+            border-radius: 30px;
+            margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -133,13 +111,13 @@
         }
 
         .logo-icon span {
-            font-size: 50px;
+            font-size: 40px;
             color: #000;
             font-weight: 900;
         }
 
         .logo-text {
-            font-size: 42px;
+            font-size: 32px;
             font-weight: 900;
             background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
             -webkit-background-clip: text;
@@ -147,23 +125,9 @@
             -webkit-text-fill-color: transparent;
         }
 
-        @media (max-width: 768px) {
-            .logo-text {
-                font-size: 32px;
-            }
-            .logo-icon {
-                width: 80px;
-                height: 80px;
-            }
-            .logo-icon span {
-                font-size: 40px;
-            }
-        }
-
         .logo-sub {
             color: var(--text-secondary);
             font-size: 14px;
-            margin-top: 10px;
         }
 
         .input-premium {
@@ -175,7 +139,6 @@
             margin-bottom: 8px;
             color: var(--text-secondary);
             font-size: 13px;
-            font-weight: 500;
         }
 
         .input-premium input {
@@ -223,18 +186,12 @@
 
         .header-premium {
             background: var(--bg-secondary);
-            padding: 15px 25px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
-        }
-
-        @media (max-width: 768px) {
-            .header-premium {
-                padding: 12px 15px;
-            }
         }
 
         .user-info-premium {
@@ -253,6 +210,12 @@
             justify-content: center;
             font-size: 24px;
             overflow: hidden;
+        }
+
+        .user-avatar-premium img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .user-text-premium h3 {
@@ -289,10 +252,9 @@
         .side-menu {
             position: absolute;
             top: 80px;
-            left: 25px;
-            right: auto;
+            left: 20px;
+            right: 20px;
             max-width: 300px;
-            width: calc(100% - 50px);
             background: var(--bg-tertiary);
             border-radius: 30px;
             border: 1px solid var(--accent-gold);
@@ -300,14 +262,6 @@
             z-index: 1000;
             display: none;
             animation: slideIn 0.3s ease;
-        }
-
-        @media (max-width: 768px) {
-            .side-menu {
-                left: 15px;
-                right: 15px;
-                max-width: none;
-            }
         }
 
         @keyframes slideIn {
@@ -360,12 +314,6 @@
             gap: 15px;
         }
 
-        @media (max-width: 768px) {
-            .chat-premium {
-                padding: 15px;
-            }
-        }
-
         .message {
             display: flex;
             margin-bottom: 10px;
@@ -399,12 +347,6 @@
             line-height: 1.6;
             word-wrap: break-word;
             position: relative;
-        }
-
-        @media (max-width: 768px) {
-            .message-bubble {
-                max-width: 85%;
-            }
         }
 
         .user-message .message-bubble {
@@ -459,6 +401,51 @@
             margin: 10px 0;
         }
 
+        .message-bubble pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .message-bubble blockquote {
+            border-right: 3px solid var(--accent-gold);
+            padding-right: 10px;
+            margin: 10px 0;
+            color: var(--text-secondary);
+        }
+
+        .message-bubble table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .message-bubble th, .message-bubble td {
+            border: 1px solid #3a3a3a;
+            padding: 8px;
+            text-align: right;
+        }
+
+        .message-bubble th {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--accent-gold);
+        }
+
+        .message-bubble img {
+            max-width: 100%;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+
+        .message-bubble a {
+            color: var(--accent-gold);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-gold);
+        }
+
+        .message-bubble a:hover {
+            color: var(--accent-orange);
+        }
+
         .message-time {
             font-size: 10px;
             color: var(--text-secondary);
@@ -469,16 +456,9 @@
         .input-premium-area {
             display: flex;
             gap: 10px;
-            padding: 15px 20px;
+            padding: 15px;
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
-        }
-
-        @media (max-width: 768px) {
-            .input-premium-area {
-                padding: 12px 15px;
-                gap: 8px;
-            }
         }
 
         .input-premium-area input {
@@ -489,7 +469,6 @@
             border-radius: 30px;
             color: var(--text-primary);
             transition: all 0.3s ease;
-            font-size: 14px;
         }
 
         .input-premium-area input:focus {
@@ -501,30 +480,23 @@
         .teaching-panel, .knowledge-panel, .reminders-panel {
             background: var(--bg-secondary);
             border-radius: 30px;
-            padding: 25px;
+            padding: 20px;
             margin: 20px;
             overflow-y: auto;
             flex: 1;
         }
 
-        @media (max-width: 768px) {
-            .teaching-panel, .knowledge-panel, .reminders-panel {
-                padding: 15px;
-                margin: 15px;
-            }
-        }
-
         .teaching-panel h3, .knowledge-panel h3, .reminders-panel h3 {
             color: var(--accent-gold);
             margin-bottom: 20px;
-            font-size: 22px;
+            font-size: 20px;
         }
 
         .teach-inputs-modern input,
         .teach-inputs-modern textarea {
             width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
             background: var(--bg-tertiary);
             border: 1px solid #3a3a3a;
             border-radius: 20px;
@@ -553,12 +525,12 @@
         .teach-btn {
             background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
             border: none;
-            padding: 12px 20px;
+            padding: 12px;
             border-radius: 30px;
             font-weight: 800;
             cursor: pointer;
+            width: 100%;
             transition: all 0.3s ease;
-            font-size: 14px;
         }
 
         .knowledge-item {
@@ -602,8 +574,6 @@
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
         }
 
         .hidden {
@@ -624,15 +594,6 @@
             animation: fadeInOut 2s ease;
             border: 1px solid var(--accent-gold);
             backdrop-filter: blur(10px);
-            white-space: nowrap;
-        }
-
-        @media (max-width: 768px) {
-            .toast-message {
-                white-space: normal;
-                text-align: center;
-                max-width: 90%;
-            }
         }
 
         @keyframes fadeInOut {
@@ -679,21 +640,22 @@
             border-radius: 10px;
         }
 
-        .google-search-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid #2196f3;
-            color: #2196f3;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-size: 12px;
-            transition: all 0.3s ease;
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-orange);
         }
 
-        .google-search-btn:hover {
-            background: #2196f3;
-            color: white;
+        @media (max-width: 768px) {
+            .message-bubble {
+                max-width: 85%;
+            }
+            
+            .login-premium, .main-premium {
+                border-radius: 30px;
+            }
+            
+            .side-menu {
+                max-width: 250px;
+            }
         }
 
         .reminder-badge {
@@ -793,7 +755,6 @@
                             <li>🎵 تنفيذ أوامر مثل: <code>افتح يوتيوب</code>، <code>شغل فيروز</code>، <code>طقس بيروت</code></li>
                             <li>📝 تنسيق النصوص باحترافية (عناوين، قوائم، أكواد)</li>
                             <li>⏰ تذكيرك بالمواعيد المهمة</li>
-                            <li>🔍 إذا لم أجد إجابة، سأبحث لك في Google تلقائياً</li>
                         </ul>
                         <p><strong>💬 ماذا تريد أن تفعل اليوم؟</strong></p>
                     </div>
@@ -860,7 +821,6 @@
         
         const TEACHER_EMAIL = "teacher@cerebonix.com";
         
-        // تهيئة Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
@@ -870,7 +830,6 @@
         let reminders = [];
         let isTeacher = false;
         let reminderInterval = null;
-        let currentTeachImage = null;
         
         // ========== الدوال المساعدة ==========
         function showToast(msg) {
@@ -924,11 +883,6 @@
             }
             
             return formatted;
-        }
-        
-        // ========== البحث في Google ==========
-        function searchGoogle(query) {
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
         }
         
         // ========== تنفيذ الأوامر ==========
@@ -1031,7 +985,6 @@
                 displayKnowledgeList();
             } catch (error) {
                 console.error('خطأ:', error);
-                showToast('❌ خطأ في تحميل البيانات: ' + error.message);
             }
         }
         
@@ -1173,7 +1126,6 @@
             if (result) {
                 addMessage(result.answer, 'bot', { image: result.image });
             } else {
-                const searchBtn = `<button class="google-search-btn" onclick='searchGoogle("${escapeHtml(msg).replace(/'/g, "\\'")}")'>🔍 بحث في Google عن: ${escapeHtml(msg.substring(0, 50))}</button>`;
                 addMessage(`📚 لم أتعلم هذا بعد يا ${currentUser?.name || 'صديقي'}.
 
 **💡 اقتراحات:**
@@ -1181,9 +1133,11 @@
 - اطلب من المعلم إضافة هذه المعلومة
 - جرب كتابة \`مساعدة\` لمعرفة الأوامر المتاحة
 
-${searchBtn}`, 'bot');
+هذه المعلومات غير موجودة حالياً في قاعدة المعرفة.`, 'bot');
             }
         }
+        
+        let currentTeachImage = null;
         
         function previewTeachImage(input) {
             const preview = document.getElementById('teachImagePreview');
@@ -1251,7 +1205,7 @@ ${searchBtn}`, 'bot');
                     <div class="knowledge-question">❓ ${escapeHtml(question)}</div>
                     <div class="knowledge-answer">💡 ${escapeHtml(data.answer.substring(0, 200))}${data.answer.length > 200 ? '...' : ''}</div>
                     ${data.image ? `<img src="${data.image}" class="knowledge-image">` : ''}
-                    ${isTeacher ? `<div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    ${isTeacher ? `<div style="margin-top: 10px; display: flex; gap: 10px;">
                         <button class="teach-btn" style="width: auto; padding: 5px 15px;" onclick="editKnowledge('${escapeHtml(question).replace(/'/g, "\\'")}')">✏️ تعديل</button>
                         <button class="teach-btn" style="width: auto; padding: 5px 15px; background: #dc3545;" onclick="deleteKnowledge('${escapeHtml(question).replace(/'/g, "\\'")}')">🗑️ حذف</button>
                     </div>` : ''}
@@ -1314,9 +1268,12 @@ ${searchBtn}`, 'bot');
             }
         }
         
-        // ========== دوال المستخدم ==========
+        // ========== دوال المستخدم مع حفظ الجلسة بشكل صحيح ==========
+        
+        // حفظ الجلسة بالكامل
         function saveSession() {
             if (currentUser) {
+                // حفظ بيانات المستخدم
                 const userToSave = {
                     email: currentUser.email,
                     name: currentUser.name,
@@ -1325,13 +1282,17 @@ ${searchBtn}`, 'bot');
                     lastLogin: new Date().toISOString()
                 };
                 localStorage.setItem('cerebonix_user', JSON.stringify(userToSave));
-                localStorage.setItem('cerebonix_session_active', 'true');
-                localStorage.setItem('cerebonix_last_active', new Date().toISOString());
                 
+                // حفظ التذكيرات بشكل منفصل
                 if (reminders.length > 0) {
                     localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
                 }
                 
+                // حفظ علامة أن الجلسة نشطة
+                localStorage.setItem('cerebonix_session_active', 'true');
+                localStorage.setItem('cerebonix_last_active', new Date().toISOString());
+                
+                // إظهار مؤشر للمستخدم
                 const badge = document.getElementById('autoLoginBadge');
                 if (badge) {
                     badge.textContent = '🔐 تم حفظ جلستك';
@@ -1343,6 +1304,7 @@ ${searchBtn}`, 'bot');
             }
         }
         
+        // استعادة الجلسة المحفوظة
         async function restoreSavedSession() {
             const savedUserStr = localStorage.getItem('cerebonix_user');
             const sessionActive = localStorage.getItem('cerebonix_session_active');
@@ -1350,35 +1312,57 @@ ${searchBtn}`, 'bot');
             if (savedUserStr && sessionActive === 'true') {
                 try {
                     const savedUser = JSON.parse(savedUserStr);
+                    
+                    // التحقق من صلاحية الجلسة (مثلاً 30 يوم)
                     const lastActive = localStorage.getItem('cerebonix_last_active');
                     if (lastActive) {
                         const lastActiveDate = new Date(lastActive);
                         const now = new Date();
                         const daysDiff = (now - lastActiveDate) / (1000 * 60 * 60 * 24);
+                        
+                        // إذا مر أكثر من 30 يوم، نطلب إعادة تسجيل دخول
                         if (daysDiff > 30) {
                             localStorage.removeItem('cerebonix_session_active');
                             return false;
                         }
                     }
                     
+                    // استعادة المستخدم
                     currentUser = {
                         email: savedUser.email,
                         name: savedUser.name,
                         isTeacher: savedUser.isTeacher || (savedUser.email === TEACHER_EMAIL),
-                        isGuest: savedUser.isGuest || false
+                        isGuest: savedUser.isGuest || false,
+                        reminders: []
                     };
+                    
                     isTeacher = currentUser.isTeacher || (currentUser.email === TEACHER_EMAIL);
                     
+                    // استعادة التذكيرات
                     const savedReminders = localStorage.getItem(`cerebonix_reminders_${currentUser.email}`);
                     if (savedReminders) {
-                        reminders = JSON.parse(savedReminders);
-                        currentUser.reminders = reminders;
+                        try {
+                            reminders = JSON.parse(savedReminders);
+                            currentUser.reminders = reminders;
+                        } catch(e) {}
                     }
                     
+                    // تحديث شاشة الدخول بالبيانات المحفوظة
+                    if (!currentUser.isGuest) {
+                        document.getElementById('userEmail').value = currentUser.email;
+                        document.getElementById('userName').value = currentUser.name;
+                        document.getElementById('rememberMe').checked = true;
+                    }
+                    
+                    // تسجيل الدخول التلقائي
                     await completeLogin();
+                    
                     showToast('👋 مرحباً بعودتك! تم تسجيل الدخول تلقائياً');
                     return true;
+                    
                 } catch(e) {
+                    console.error('خطأ في استعادة الجلسة:', e);
+                    localStorage.removeItem('cerebonix_session_active');
                     return false;
                 }
             }
@@ -1425,6 +1409,7 @@ ${searchBtn}`, 'bot');
             };
             isTeacher = false;
             
+            // حفظ جلسة الزائر
             saveSession();
             await completeLogin();
         }
@@ -1432,6 +1417,7 @@ ${searchBtn}`, 'bot');
         async function completeLogin() {
             reminders = currentUser.reminders || [];
             
+            // تحميل التذكيرات المحفوظة
             if (!currentUser.isGuest && localStorage.getItem(`cerebonix_reminders_${currentUser.email}`)) {
                 try {
                     const savedReminders = JSON.parse(localStorage.getItem(`cerebonix_reminders_${currentUser.email}`));
@@ -1480,7 +1466,6 @@ ${searchBtn}`, 'bot');
 - 🎵 استخدام الأوامر مثل "افتح يوتيوب" أو "شغل أغنية"
 - ⏰ إضافة تذكيرات للمواعيد المهمة
 - 📝 كتابة \`مساعدة\` لمعرفة جميع الأوامر
-- 🔍 إذا لم أجد إجابة، سأبحث لك في Google
 
 **ماذا تريد أن تسأل اليوم؟**`, 'bot');
             }
@@ -1501,6 +1486,7 @@ ${searchBtn}`, 'bot');
                 localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
             }
             
+            // مسح جلسة المستخدم الحالي فقط
             localStorage.removeItem('cerebonix_session_active');
             if (currentUser && !currentUser.isGuest) {
                 localStorage.removeItem('cerebonix_user');
@@ -1688,19 +1674,19 @@ ${searchBtn}`, 'bot');
                 sendMessage();
             };
             
-            recognition.onerror = () => {
+            recognition.onerror = (event) => {
+                console.error('Speech error:', event.error);
                 showToast('❌ لم يتم التعرف على الصوت، حاول مرة أخرى');
             };
             
             recognition.start();
         }
         
-        // ========== بدء التطبيق ==========
+        // ========== بدء التطبيق واستعادة الجلسة ==========
         document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('mainScreen').classList.add('hidden');
-            
+            // محاولة استعادة الجلسة المحفوظة
             const restored = await restoreSavedSession();
+            
             if (!restored) {
                 // إذا لم توجد جلسة محفوظة، نظهر شاشة الدخول
                 document.getElementById('loginScreen').style.display = 'block';
@@ -1708,12 +1694,14 @@ ${searchBtn}`, 'bot');
             }
         });
         
+        // حفظ الجلسة بشكل دوري (كل دقيقة)
         setInterval(() => {
             if (currentUser) {
                 saveSession();
             }
         }, 60000);
         
+        // حفظ الجلسة قبل إغلاق الصفحة
         window.addEventListener('beforeunload', () => {
             if (currentUser) {
                 saveSession();
