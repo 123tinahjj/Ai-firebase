@@ -1,22 +1,9 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Cerebonix - الذاكرة السحابية المتطورة</title>
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    
-    <!-- Markdown Library -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
-    <!-- Highlight.js لتحسين تنسيق الكود -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Cerebonix - ذاكرتي المتكاملة</title>
     <style>
         * {
             margin: 0;
@@ -36,11 +23,12 @@
             --text-secondary: #888888;
             --border-color: rgba(255, 215, 0, 0.2);
             --font-family: 'Cairo', 'Poppins', sans-serif;
-            --success: #00c853;
-            --error: #ff3b30;
-            --warning: #ff9500;
+            --message-user-bg: linear-gradient(145deg, #FFD700, #FFA500);
+            --message-bot-bg: #2a2a2a;
         }
 
+        html[lang="en"] { direction: ltr; }
+        
         body {
             background: var(--bg-primary);
             min-height: 100vh;
@@ -49,8 +37,7 @@
             align-items: center;
             padding: 10px;
             font-family: var(--font-family);
-            margin: 0;
-            overflow: hidden;
+            position: relative;
         }
 
         .background-gradient {
@@ -60,8 +47,33 @@
             right: 0;
             bottom: 0;
             background: radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(255, 165, 0, 0.02) 0%, transparent 50%);
+                        radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+                        linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
             z-index: -2;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            animation: floatParticle 15s infinite linear;
+        }
+
+        @keyframes floatParticle {
+            from { transform: translateY(100vh) translateX(-100px); opacity: 0; }
+            to { transform: translateY(-100vh) translateX(100px); opacity: 0.5; }
         }
 
         .login-premium, .main-premium {
@@ -70,8 +82,9 @@
             border-radius: 48px;
             width: 100%;
             max-width: 500px;
-            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-color) inset;
             border: 1px solid var(--border-color);
+            animation: premiumAppear 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
 
         .main-premium {
@@ -79,156 +92,152 @@
             height: 90vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes premiumAppear {
+            from { opacity: 0; transform: scale(0.95) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .login-premium {
-            padding: 30px;
-            max-height: 90vh;
-            overflow-y: auto;
+            padding: clamp(30px, 5vw, 50px) clamp(20px, 4vw, 40px);
+            display: block;
         }
 
-        .premium-logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
+        .premium-logo { text-align: center; margin-bottom: clamp(30px, 4vw, 40px); }
+        
         .logo-icon {
-            width: 80px;
-            height: 80px;
+            width: min(90px, 20vw);
+            height: min(90px, 20vw);
             background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
             border-radius: 30px;
+            margin: 0 auto clamp(15px, 2vw, 20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            from { transform: rotate(0deg) translateX(-100%); }
+            to { transform: rotate(0deg) translateX(100%); }
+        }
+
+        .logo-icon span { font-size: clamp(35px, 8vw, 40px); color: #000; font-weight: 900; position: relative; z-index: 1; }
+        .logo-text { font-size: clamp(24px, 6vw, 32px); font-weight: 900; background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-sub { color: var(--text-secondary); font-size: clamp(14px, 3.5vw, 16px); }
+
+        .welcome-premium {
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 32px;
+            padding: clamp(20px, 4vw, 30px);
+            margin-bottom: clamp(25px, 4vw, 35px);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .welcome-premium p { color: var(--text-primary); font-size: clamp(16px, 4vw, 18px); }
+        .welcome-premium .big-text { font-size: clamp(26px, 7vw, 36px); font-weight: 900; color: var(--accent-gold); margin: 10px 0; }
+        .heart-icon { font-size: clamp(30px, 8vw, 40px); animation: heartbeat 1.5s ease infinite; display: inline-block; }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.2); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            70% { transform: scale(1); }
+        }
+
+        .photo-upload { text-align: center; margin-bottom: clamp(20px, 3vw, 25px); }
+        
+        .photo-preview {
+            width: min(120px, 30vw);
+            height: min(120px, 30vw);
+            border-radius: 40px;
+            background: var(--bg-tertiary);
             margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: pulse 2s infinite;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid rgba(255, 215, 0, 0.5);
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .logo-icon span {
-            font-size: 40px;
-            color: #000;
-            font-weight: 900;
-        }
-
-        .logo-text {
-            font-size: 32px;
-            font-weight: 900;
-            background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .logo-sub {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
+        .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-preview span { color: var(--text-secondary); font-size: clamp(12px, 3vw, 14px); }
 
         .input-premium {
-            margin-bottom: 20px;
+            margin-bottom: clamp(20px, 3vw, 25px);
+            position: relative;
         }
 
-        .input-premium label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-
+        .input-premium label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: clamp(13px, 3vw, 14px); }
         .input-premium input {
             width: 100%;
-            padding: 15px 20px;
+            padding: clamp(15px, 3vw, 18px) clamp(20px, 4vw, 25px);
             background: var(--bg-tertiary);
             border: 2px solid #3a3a3a;
             border-radius: 30px;
-            font-size: 14px;
+            font-size: clamp(14px, 3.5vw, 16px);
             color: var(--text-primary);
-            transition: all 0.3s ease;
         }
+        .input-premium input:focus { outline: none; border-color: var(--accent-gold); }
 
-        .input-premium input:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        }
-
-        .login-premium-btn, .guest-btn {
+        .login-premium-btn {
             width: 100%;
-            padding: 15px;
+            padding: clamp(15px, 3vw, 18px);
             background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
             border: none;
             border-radius: 30px;
-            font-size: 18px;
+            font-size: clamp(18px, 4.5vw, 20px);
             font-weight: 800;
             color: #000;
             cursor: pointer;
             margin-top: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .login-premium-btn:hover, .guest-btn:hover, .teach-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
-        }
-
-        .guest-btn {
-            background: transparent;
-            border: 2px solid var(--accent-gold);
-            color: var(--accent-gold);
-            margin-top: 5px;
-        }
+        .footer-premium { text-align: center; margin-top: clamp(20px, 3vw, 25px); color: #666; }
 
         .header-premium {
             background: var(--bg-secondary);
-            padding: 15px 20px;
+            padding: clamp(15px, 2vw, 20px) clamp(20px, 3vw, 30px);
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
         }
 
-        .user-info-premium {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
+        .user-info-premium { display: flex; align-items: center; gap: clamp(10px, 2vw, 20px); }
+        
         .user-avatar-premium {
-            width: 50px;
-            height: 50px;
-            border-radius: 25px;
+            width: clamp(50px, 8vw, 60px);
+            height: clamp(50px, 8vw, 60px);
+            border-radius: 20px;
             background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
             overflow: hidden;
         }
+        
+        .user-avatar-premium img { width: 100%; height: 100%; object-fit: cover; }
+        .user-text-premium h3 { color: var(--accent-gold); }
+        .user-text-premium p { color: var(--text-secondary); }
 
-        .user-avatar-premium img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .user-text-premium h3 {
-            font-size: 16px;
-            color: var(--accent-gold);
-        }
-
-        .user-text-premium p {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .menu-btn, .voice-btn {
+        .menu-btn {
             background: var(--bg-tertiary);
             border: 1px solid var(--accent-gold);
             color: var(--accent-gold);
@@ -240,456 +249,287 @@
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .menu-btn:hover, .voice-btn:hover {
-            background: var(--accent-gold);
-            color: #000;
-            transform: scale(1.05);
         }
 
         .side-menu {
             position: absolute;
-            top: 80px;
+            top: 90px;
             left: 20px;
             right: 20px;
-            max-width: 300px;
+            max-width: 350px;
             background: var(--bg-tertiary);
             border-radius: 30px;
             border: 1px solid var(--accent-gold);
-            padding: 15px;
+            padding: 20px;
             z-index: 1000;
             display: none;
-            animation: slideIn 0.3s ease;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .side-menu.show {
-            display: block;
-        }
+        .side-menu.show { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 
         .menu-item {
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 12px 15px;
+            padding: 15px 20px;
             border-radius: 20px;
             cursor: pointer;
             color: var(--text-primary);
-            transition: all 0.3s ease;
+        }
+        .menu-item:hover { background: rgba(255, 215, 0, 0.1); }
+        .menu-item.active { background: var(--accent-gold); color: #000; }
+
+        .teaching-panel, .reminders-panel, .multimedia-panel {
+            background: var(--bg-secondary);
+            border-radius: 30px;
+            padding: 20px;
+            margin: 20px;
+            overflow-y: auto;
         }
 
-        .menu-item:hover {
-            background: rgba(255, 215, 0, 0.1);
+        .teaching-panel h3, .reminders-panel h3, .multimedia-panel h3 {
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .menu-item.active {
-            background: var(--accent-gold);
+        .teach-inputs-modern {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .teach-inputs-modern input, .teach-inputs-modern textarea, .multimedia-inputs input, .multimedia-inputs select {
+            width: 100%;
+            padding: 15px 20px;
+            background: var(--bg-tertiary);
+            border: 2px solid #3a3a3a;
+            border-radius: 30px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .teach-inputs-modern textarea { min-height: 100px; }
+
+        .teach-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .teach-btn {
+            background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 800;
             color: #000;
-        }
-
-        .menu-item.disabled {
-            opacity: 0.5;
-            pointer-events: none;
+            cursor: pointer;
+            flex: 1;
         }
 
         .chat-premium {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: clamp(20px, 3vw, 30px);
             background: var(--bg-secondary);
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
 
-        .message {
-            display: flex;
-            margin-bottom: 10px;
-            animation: fadeInUp 0.3s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .user-message {
-            justify-content: flex-end;
-        }
-
-        .bot-message {
-            justify-content: flex-start;
-        }
+        .message { display: flex; margin-bottom: 10px; animation: messagePop 0.3s ease; }
+        .user-message { justify-content: flex-end; }
+        .bot-message { justify-content: flex-start; }
 
         .message-bubble {
-            max-width: 75%;
-            padding: 12px 18px;
-            border-radius: 20px;
-            font-size: 14px;
+            max-width: min(70%, 600px);
+            padding: clamp(12px, 2vw, 18px) clamp(18px, 3vw, 28px);
+            border-radius: 30px;
+            font-size: clamp(14px, 2.5vw, 16px);
             line-height: 1.6;
             word-wrap: break-word;
-            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .user-message .message-bubble {
-            background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
+            background: var(--message-user-bg);
             color: #000;
             font-weight: 600;
-            border-bottom-left-radius: 5px;
-        }
-
-        .bot-message .message-bubble {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid #3a3a3a;
             border-bottom-right-radius: 5px;
         }
 
-        .message-bubble h1, .message-bubble h2, .message-bubble h3 {
-            margin: 10px 0;
-            color: var(--accent-gold);
-        }
-
-        .message-bubble h1 { font-size: 20px; }
-        .message-bubble h2 { font-size: 18px; }
-        .message-bubble h3 { font-size: 16px; }
-
-        .message-bubble p {
-            margin: 8px 0;
-        }
-
-        .message-bubble ul, .message-bubble ol {
-            margin: 8px 0;
-            padding-right: 20px;
-        }
-
-        .message-bubble li {
-            margin: 4px 0;
-        }
-
-        .message-bubble code {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 2px 6px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 13px;
-        }
-
-        .message-bubble pre {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 10px;
-            border-radius: 10px;
-            overflow-x: auto;
-            margin: 10px 0;
-        }
-
-        .message-bubble pre code {
-            background: none;
-            padding: 0;
-        }
-
-        .message-bubble blockquote {
-            border-right: 3px solid var(--accent-gold);
-            padding-right: 10px;
-            margin: 10px 0;
-            color: var(--text-secondary);
-        }
-
-        .message-bubble table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 10px 0;
-        }
-
-        .message-bubble th, .message-bubble td {
+        .bot-message .message-bubble {
+            background: var(--message-bot-bg);
+            color: var(--text-primary);
             border: 1px solid #3a3a3a;
-            padding: 8px;
-            text-align: right;
+            border-bottom-left-radius: 5px;
         }
 
-        .message-bubble th {
-            background: rgba(255, 215, 0, 0.1);
-            color: var(--accent-gold);
-        }
-
-        .message-bubble img {
+        .message-media {
             max-width: 100%;
             border-radius: 15px;
-            margin: 10px 0;
+            margin-top: 10px;
+            cursor: pointer;
         }
+        
+        .message-media.video-media { max-height: 300px; width: 100%; }
+        .message-media.audio-media { width: 100%; max-width: 250px; }
 
-        .message-bubble a {
+        .speak-btn {
+            background: none;
+            border: 1px solid var(--accent-gold);
             color: var(--accent-gold);
-            text-decoration: none;
-            border-bottom: 1px dashed var(--accent-gold);
-        }
-
-        .message-bubble a:hover {
-            color: var(--accent-orange);
-        }
-
-        .message-time {
-            font-size: 10px;
-            color: var(--text-secondary);
+            padding: 3px 12px;
+            border-radius: 30px;
             margin-top: 5px;
-            opacity: 0.7;
+            cursor: pointer;
+            display: inline-block;
         }
 
         .input-premium-area {
             display: flex;
             gap: 10px;
-            padding: 15px;
+            padding: clamp(12px, 2vw, 20px) clamp(15px, 2.5vw, 25px);
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
         }
 
         .input-premium-area input {
             flex: 1;
-            padding: 15px 20px;
+            padding: clamp(12px, 2vw, 16px) clamp(18px, 3vw, 25px);
             background: var(--bg-tertiary);
             border: 2px solid #3a3a3a;
-            border-radius: 30px;
+            border-radius: 40px;
             color: var(--text-primary);
-            transition: all 0.3s ease;
         }
 
-        .input-premium-area input:focus {
-            border-color: var(--accent-gold);
-            outline: none;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        }
-
-        .teaching-panel, .knowledge-panel, .reminders-panel {
-            background: var(--bg-secondary);
-            border-radius: 30px;
-            padding: 20px;
-            margin: 20px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .teaching-panel h3, .knowledge-panel h3, .reminders-panel h3 {
-            color: var(--accent-gold);
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-
-        .teach-inputs-modern input,
-        .teach-inputs-modern textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
+        .voice-btn {
             background: var(--bg-tertiary);
-            border: 1px solid #3a3a3a;
-            border-radius: 20px;
-            color: var(--text-primary);
-            font-family: var(--font-family);
-            transition: all 0.3s ease;
-        }
-
-        .teach-inputs-modern input:focus,
-        .teach-inputs-modern textarea:focus {
-            border-color: var(--accent-gold);
-            outline: none;
-        }
-
-        .image-preview-area {
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .image-preview-area img {
-            max-width: 100%;
-            max-height: 150px;
-            border-radius: 15px;
-        }
-
-        .teach-btn {
-            background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
-            border: none;
-            padding: 12px;
-            border-radius: 30px;
-            font-weight: 800;
+            border: 2px solid var(--accent-gold);
+            color: var(--accent-gold);
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
             cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
         }
 
-        .knowledge-item {
-            background: var(--bg-tertiary);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-right: 3px solid var(--accent-gold);
-            transition: all 0.3s ease;
-        }
-
-        .knowledge-item:hover {
-            transform: translateX(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .knowledge-question {
-            font-weight: bold;
-            color: var(--accent-gold);
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-
-        .knowledge-answer {
-            color: var(--text-primary);
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .knowledge-image {
-            max-width: 100%;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
+        .voice-btn.recording { background: var(--accent-gold); color: #000; animation: recording 1s infinite; }
+        @keyframes recording { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
         .stats-premium {
-            padding: 10px 20px;
+            padding: clamp(8px, 1.5vw, 12px) clamp(15px, 2.5vw, 25px);
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
             color: var(--text-secondary);
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            flex-wrap: wrap;
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .stats-premium span { color: var(--accent-gold); }
 
-        .toast-message {
+        .password-modal {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.95);
-            color: var(--accent-gold);
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 14px;
-            z-index: 3000;
-            animation: fadeInOut 2s ease;
-            border: 1px solid var(--accent-gold);
-            backdrop-filter: blur(10px);
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            85% { opacity: 1; }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-        }
-
-        .typing-indicator {
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
             display: flex;
-            gap: 4px;
-            padding: 10px;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
         }
 
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-gold);
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
+        .password-modal.hidden { display: none; }
 
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
+        .modal-content {
             background: var(--bg-tertiary);
-            border-radius: 10px;
+            padding: 30px;
+            border-radius: 40px;
+            max-width: 400px;
+            width: 90%;
+            border: 2px solid var(--accent-gold);
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-gold);
-            border-radius: 10px;
+        .modal-content h3 { color: var(--accent-gold); margin-bottom: 20px; }
+        .modal-content input {
+            width: 100%;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border: 2px solid #3a3a3a;
+            border-radius: 30px;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+        .modal-content button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
+            border: none;
+            border-radius: 30px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-bottom: 10px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-orange);
+        .hidden { display: none !important; }
+
+        .reminder-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            margin-bottom: 10px;
         }
 
-        @media (max-width: 768px) {
-            .message-bubble {
-                max-width: 85%;
-            }
-            
-            .login-premium, .main-premium {
-                border-radius: 30px;
-            }
-            
-            .side-menu {
-                max-width: 250px;
-            }
-        }
+        .delete-btn { background: none; border: none; color: #ff4444; font-size: 20px; cursor: pointer; }
 
-        .reminder-badge {
-            background: var(--accent-gold);
-            color: #000;
-            border-radius: 10px;
-            padding: 2px 8px;
-            font-size: 10px;
-            margin-right: 5px;
-        }
-        
-        .auto-login-badge {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.5);
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            color: var(--accent-gold);
-            z-index: 999;
+        @media (min-width: 1024px) {
+            .side-menu { display: block !important; position: static; max-width: 300px; margin: 20px; height: fit-content; }
+            .main-premium { flex-direction: row; align-items: stretch; }
+            .header-premium { position: absolute; width: 100%; z-index: 10; }
+            #contentArea { margin-right: 340px; margin-top: 80px; height: calc(100% - 80px); flex: 1; }
+            .menu-btn { display: none; }
         }
     </style>
 </head>
 <body>
     <div class="background-gradient"></div>
-    <div class="auto-login-badge" id="autoLoginBadge"></div>
+    <div class="particles" id="particles"></div>
 
     <!-- شاشة الدخول -->
     <div class="login-premium" id="loginScreen">
         <div class="premium-logo">
             <div class="logo-icon"><span>🧠</span></div>
             <div class="logo-text">Cerebonix</div>
-            <div class="logo-sub">الذاكرة السحابية المتطورة</div>
+            <div class="logo-sub">صفحتك البيضاء</div>
+        </div>
+
+        <div class="welcome-premium">
+            <p>أنا ذكاء اصطناعي</p>
+            <div class="big-text">صفحة بيضاء</div>
+            <p>خلقت من أجلك وحدك</p>
+            <p>📝 لأحفظ كل ما تريد</p>
+            <p>🖼️ نص - صورة - فيديو - صوت</p>
+            <div class="heart-icon">❤️</div>
+        </div>
+
+        <div class="photo-upload">
+            <label for="profileImage" class="photo-preview" id="photoPreview">
+                <img id="profileImg" src="" style="display: none;">
+                <span id="photoText">أضف صورتك</span>
+            </label>
+            <input type="file" id="profileImage" accept="image/*" style="display: none;" onchange="previewPhoto(this)">
         </div>
 
         <div class="input-premium">
@@ -707,17 +547,10 @@
             <input type="text" id="userName" placeholder="أدخل اسمك">
         </div>
 
-        <div class="input-premium">
-            <label>
-                <input type="checkbox" id="rememberMe" checked> تذكرني (حفظ الجلسة تلقائياً)
-            </label>
-        </div>
+        <button class="login-premium-btn" onclick="login()">ابدأ رحلتك</button>
 
-        <button class="login-premium-btn" onclick="login()">🚀 ابدأ رحلتك</button>
-        <button class="guest-btn" onclick="loginAsGuest()">👋 دخول كزائر</button>
-
-        <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
-            <span>☁️</span> المعرفة سحابية مشتركة <span>🌍</span>
+        <div class="footer-premium">
+            <span>✨</span> أنت من تملأني بالحياة <span>✨</span>
         </div>
     </div>
 
@@ -726,62 +559,66 @@
         <div class="header-premium">
             <div class="user-info-premium">
                 <div class="user-avatar-premium" id="userAvatar">
-                    <span>👤</span>
+                    <img id="avatarDisplay" src="" style="display: none;">
+                    <span id="avatarText">👤</span>
                 </div>
                 <div class="user-text-premium">
-                    <h3 id="displayName">زائر</h3>
-                    <p id="displayEmail">guest@cerebonix.com</p>
+                    <h3 id="displayName">مستخدم</h3>
+                    <p id="displayEmail">user@example.com</p>
                 </div>
             </div>
             <div class="menu-btn" onclick="toggleMenu()">☰</div>
         </div>
 
         <div class="side-menu" id="sideMenu">
-            <div class="menu-item active" onclick="switchMenuTab('chat', this)"><span>💬</span> <span>المحادثة</span></div>
-            <div class="menu-item" id="teachMenuItem" onclick="switchMenuTab('teach', this)"><span>📚</span> <span>تعليم الذكاء</span></div>
-            <div class="menu-item" onclick="switchMenuTab('knowledge', this)"><span>📖</span> <span>قاعدة المعرفة</span></div>
-            <div class="menu-item" onclick="switchMenuTab('reminders', this)"><span>⏰</span> <span>التذكيرات</span></div>
-            <div class="menu-item" onclick="logout()"><span>🚪</span> <span>تسجيل الخروج</span></div>
+            <div class="menu-item active" onclick="switchMenuTab('chat')"><span>💬</span> <span>المحادثة</span></div>
+            <div class="menu-item" onclick="switchMenuTab('teach')"><span>📚</span> <span>تعليم الذكاء</span></div>
+            <div class="menu-item" onclick="switchMenuTab('multimedia')"><span>🎬</span> <span>وسائط متعددة</span></div>
+            <div class="menu-item" onclick="switchMenuTab('reminders')"><span>⏰</span> <span>التذكيرات</span></div>
+            <div class="menu-item" onclick="toggleLanguage()"><span>🌐</span> <span>تغيير اللغة</span></div>
+            <div class="menu-item" onclick="confirmLogout()"><span>🚪</span> <span>تسجيل الخروج</span></div>
         </div>
 
         <div id="contentArea" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
             <div class="chat-premium" id="chatArea">
                 <div class="message bot-message">
                     <div class="message-bubble">
-                        <h2>🌍 مرحباً بك في Cerebonix!</h2>
-                        <p>أنا مساعدك الذكي المدعوم بالذاكرة السحابية المشتركة. يمكنني:</p>
-                        <ul>
-                            <li>📸 استقبال الصور مع الأسئلة والأجوبة</li>
-                            <li>🎵 تنفيذ أوامر مثل: <code>افتح يوتيوب</code>، <code>شغل فيروز</code>، <code>طقس بيروت</code></li>
-                            <li>📝 تنسيق النصوص باحترافية (عناوين، قوائم، أكواد)</li>
-                            <li>⏰ تذكيرك بالمواعيد المهمة</li>
-                        </ul>
-                        <p><strong>💬 ماذا تريد أن تفعل اليوم؟</strong></p>
+                        👋 مرحباً! أنا Cerebonix - صفحتك البيضاء<br>
+                        <small>📝 يمكنك تعليمي نصوص، صور، فيديوهات، صوتيات</small>
                     </div>
                 </div>
             </div>
 
             <div class="teaching-panel hidden" id="teachPanel">
-                <h3>📚 تعليم Cerebonix (للمعلم فقط)</h3>
+                <h3>📚 تعليم Cerebonix (نص فقط)</h3>
                 <div class="teach-inputs-modern">
-                    <input type="text" id="teachQ" placeholder="السؤال...">
-                    <textarea id="teachA" rows="3" placeholder="الجواب... (يدعم Markdown للتنسيق)"></textarea>
-                    <input type="file" id="teachImage" accept="image/*" onchange="previewTeachImage(this)">
-                    <div class="image-preview-area" id="teachImagePreview"></div>
-                    <button class="teach-btn" onclick="teachCloud()">📤 تعليم للسحابة</button>
-                </div>
-                <div style="font-size: 12px; color: #666; margin-top: 10px; text-align: center;">
-                    🌍 أي معلومة تعلمها تصبح متاحة لكل المستخدمين<br>
-                    ✨ يمكنك استخدام Markdown في الإجابات: **عريض**، *مائل*، # عناوين، - قوائم
+                    <input type="text" id="teachQ" placeholder="السؤال أو المفتاح">
+                    <textarea id="teachA" rows="4" placeholder="الإجابة النصية..."></textarea>
+                    <div class="teach-buttons">
+                        <button class="teach-btn" onclick="teachStatic()">🔒 حفظ كمعرفة ثابتة</button>
+                        <button class="teach-btn" onclick="teachUpdateable()">🔄 حفظ كمعرفة قابلة للتحديث</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="knowledge-panel hidden" id="knowledgePanel">
-                <h3>📖 قاعدة المعرفة السحابية</h3>
-                <div class="teach-inputs-modern">
-                    <input type="text" id="searchKnowledge" placeholder="🔍 بحث في قاعدة المعرفة..." onkeyup="searchKnowledge()">
+            <div class="multimedia-panel hidden" id="multimediaPanel">
+                <h3>🎬 وسائط متعددة (صورة - فيديو - صوت)</h3>
+                <div class="teach-inputs-modern multimedia-inputs">
+                    <input type="text" id="mediaKey" placeholder="الكلمة المفتاحية (مثل: فيديو تعليمي)">
+                    <select id="mediaType">
+                        <option value="image">🖼️ صورة</option>
+                        <option value="video">🎥 فيديو</option>
+                        <option value="audio">🎵 صوت</option>
+                    </select>
+                    <input type="text" id="mediaUrl" placeholder="رابط الوسائط (YouTube, MP4, MP3, JPG, PNG, GIF)">
+                    <input type="text" id="mediaCaption" placeholder="وصف قصير (اختياري)">
+                    <div class="teach-buttons">
+                        <button class="teach-btn" onclick="saveMedia()">💾 حفظ الوسائط</button>
+                    </div>
+                    <div class="memory-limit" style="margin-top: 10px;">
+                        💡 يمكنك استخدام روابط من: YouTube, Imgur, GIPHY, أو أي رابط مباشر للصورة/الفيديو/الصوت
+                    </div>
                 </div>
-                <div id="knowledgeList" class="knowledge-list"></div>
             </div>
 
             <div class="reminders-panel hidden" id="remindersPanel">
@@ -791,265 +628,207 @@
                     <input type="datetime-local" id="reminderTime">
                     <button class="teach-btn" onclick="addReminder()">➕ إضافة تذكير</button>
                 </div>
-                <div id="remindersList" class="knowledge-list"></div>
+                <div id="remindersList"></div>
             </div>
         </div>
 
         <div class="input-premium-area">
-            <input type="text" id="userMessage" placeholder="اكتب رسالتك أو أمراً... (يدعم Markdown)" onkeypress="if(event.key==='Enter') sendMessage()">
-            <div class="voice-btn" onclick="startVoiceInput()">🎤</div>
-            <button class="teach-btn" onclick="sendMessage()" style="width: auto; padding: 0 25px;">إرسال</button>
+            <input type="text" id="userMessage" placeholder="اكتب رسالتك..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <div class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()">🎤</div>
+            <button class="teach-btn" onclick="sendMessage()">إرسال</button>
         </div>
 
-        <div class="stats-premium">
-            <span>📚 <span id="knowledgeCount">0</span> معلومة</span>
-            <span>☁️ ذاكرة مشتركة عالمية</span>
-            <span>👥 <span id="onlineCount">1</span> متصل</span>
+        <div class="stats-premium" id="stats">
+            <span>📚 تعلمت <span id="knowledgeCount">0</span> معلومة</span>
+            <span>🎬 <span id="mediaCount">0</span> وسائط</span>
+        </div>
+    </div>
+
+    <div class="password-modal hidden" id="passwordModal">
+        <div class="modal-content">
+            <h3>🔐 تأكيد تسجيل الخروج</h3>
+            <p>كلمة المرور: <strong>1234</strong></p>
+            <input type="password" id="logoutPassword" placeholder="أدخل 1234">
+            <button onclick="verifyAndLogout()">تأكيد وتسجيل الخروج</button>
+            <button class="cancel-btn" onclick="hidePasswordModal()">إلغاء</button>
         </div>
     </div>
 
     <script>
-        // ========== إعدادات Firebase ==========
-        const firebaseConfig = {
-            apiKey: "AIzaSyA6ehqqjfFxg8o_jQmYfsXi12akns48yx8",
-            authDomain: "cerebonix.firebaseapp.com",
-            projectId: "cerebonix",
-            storageBucket: "cerebonix.firebasestorage.app",
-            messagingSenderId: "359951359017",
-            appId: "1:359951359017:web:8ed923237e31ca635c5038"
+        // ========== المعرفة الأساسية ==========
+        const publicKnowledge = {
+            "السلام عليكم": "وعليكم السلام ورحمة الله وبركاته",
+            "كيف حالك": "الحمد لله، بخير، كيف يمكنني مساعدتك؟",
+            "ما اسمك": "اسمي Cerebonix، أنا ذكاء اصطناعي",
+            "شكرا": "العفو، دائماً في خدمتك ❤️",
+            "كم عمرك": "عمري لحظة خلقها أنت",
+            "ما هي مهمتك": "مهمتي أن أحفظ كل ما تعلمني وأذكرك به",
+            "مرحبا": "اهلا كيف يمكنني مساعدتك اليوم؟",
+            "هل تحبني": "نعم احبك ❤️"
         };
+
+        // المعرفة بأنواعها
+        let staticKnowledge = {};
+        let updateableKnowledge = {};
         
-        const TEACHER_EMAIL = "teacher@cerebonix.com";
+        // المعرفة بالوسائط المتعددة
+        let multimediaKnowledge = {}; // { "key": { type: "image/video/audio", url: "...", caption: "..." } }
         
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
-        // ========== المتغيرات ==========
-        let knowledgeBase = {};
         let currentUser = null;
         let reminders = [];
-        let isTeacher = false;
         let reminderInterval = null;
-        
-        // ========== الدوال المساعدة ==========
-        function showToast(msg) {
-            const toast = document.createElement('div');
-            toast.className = 'toast-message';
-            toast.textContent = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
+        let mediaRecorder = null;
+        let isRecording = false;
+
+        // ========== التهيئة ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            updateStats();
+            checkSavedSession();
+        });
+
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
         }
-        
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function formatMessage(text) {
-            if (!text) return '';
-            
-            let formatted = text;
-            
-            try {
-                if (typeof marked !== 'undefined') {
-                    marked.setOptions({
-                        highlight: function(code, lang) {
-                            if (lang && hljs.getLanguage(lang)) {
-                                try {
-                                    return hljs.highlight(code, { language: lang }).value;
-                                } catch(e) {}
-                            }
-                            return code;
-                        },
-                        breaks: true,
-                        gfm: true
-                    });
-                    formatted = marked.parse(text);
-                } else {
-                    formatted = text
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                        .replace(/`(.*?)`/g, '<code>$1</code>')
-                        .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
-                        .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
-                        .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
-                        .replace(/^- (.*?)$/gm, '<li>$1</li>')
-                        .replace(/\n/g, '<br>');
-                }
-            } catch(e) {
-                formatted = text.replace(/\n/g, '<br>');
-            }
-            
-            return formatted;
-        }
-        
-        // ========== تنفيذ الأوامر ==========
-        async function executeCommand(command) {
-            const cmd = command.toLowerCase().trim();
-            
-            if (cmd.includes('افتح يوتيوب') || cmd === 'يوتيوب') {
-                window.open('https://www.youtube.com', '_blank');
-                return '✅ تم فتح YouTube';
-            }
-            
-            if (cmd.includes('افتح جوجل') || cmd === 'جوجل' || cmd.includes('google')) {
-                window.open('https://www.google.com', '_blank');
-                return '✅ تم فتح Google';
-            }
-            
-            if (cmd.includes('افتح فيسبوك') || cmd === 'فيسبوك') {
-                window.open('https://www.facebook.com', '_blank');
-                return '✅ تم فتح Facebook';
-            }
-            
-            if (cmd.includes('افتح تويتر') || cmd === 'تويتر' || cmd.includes('x')) {
-                window.open('https://twitter.com', '_blank');
-                return '✅ تم فتح Twitter';
-            }
-            
-            if (cmd.includes('شغل') || cmd.includes('شغّل')) {
-                let song = cmd.replace('شغل', '').replace('شغّل', '').replace('لي', '').replace('اغنية', '').trim();
-                if (song) {
-                    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(song)}`, '_blank');
-                    return `🎵 جارٍ تشغيل "${song}" على YouTube`;
-                }
-                return '🎵 على ماذا تريد أن تشغل؟ (مثال: شغل فيروز)';
-            }
-            
-            if (cmd.includes('الوقت') || cmd.includes('الساعة')) {
-                const now = new Date();
-                return `🕐 الوقت الآن: ${now.toLocaleTimeString('ar-SA')}`;
-            }
-            
-            if (cmd.includes('التاريخ')) {
-                const now = new Date();
-                return `📅 اليوم: ${now.toLocaleDateString('ar-SA')}`;
-            }
-            
-            if (cmd.includes('المعلم') || cmd.includes('من المعلم')) {
-                return `👨‍🏫 المعلم الرسمي للتطبيق: ${TEACHER_EMAIL}`;
-            }
-            
-            if (cmd.includes('عدد المعلومات') || cmd.includes('كم معلومة')) {
-                return `📚 عدد المعلومات في قاعدة المعرفة: ${Object.keys(knowledgeBase).length} معلومة`;
-            }
-            
-            if (cmd.includes('طقس')) {
-                let city = cmd.replace('طقس', '').trim();
-                if (!city) city = 'cairo';
+
+        function checkSavedSession() {
+            const savedSession = localStorage.getItem('cerebonix_session');
+            if (savedSession) {
                 try {
-                    const response = await fetch(`https://goweather.herokuapp.com/weather/${encodeURIComponent(city)}`);
-                    const data = await response.json();
-                    if (data.temperature) {
-                        return `🌤️ **طقس ${city}:**\n🌡️ درجة الحرارة: ${data.temperature}\n💨 الرياح: ${data.wind || 'غير متوفر'}\n📝 ${data.description || ''}`;
+                    const sessionData = JSON.parse(savedSession);
+                    const userData = localStorage.getItem('user_' + sessionData.email);
+                    if (userData) {
+                        currentUser = JSON.parse(userData);
+                        staticKnowledge = currentUser.staticKnowledge || {};
+                        updateableKnowledge = currentUser.updateableKnowledge || {};
+                        multimediaKnowledge = currentUser.multimediaKnowledge || {};
+                        reminders = currentUser.reminders || [];
+                        setTimeout(() => {
+                            document.getElementById('loginScreen').style.display = 'none';
+                            document.getElementById('mainScreen').classList.remove('hidden');
+                            updateUserInterface();
+                            updateStats();
+                            updateRemindersList();
+                            startReminderChecker();
+                            addMessage(`مرحباً بعودتك يا ${currentUser.name} 👋`, 'bot');
+                        }, 100);
+                    } else {
+                        document.getElementById('loginScreen').style.display = 'block';
+                        document.getElementById('mainScreen').classList.add('hidden');
                     }
-                } catch(e) {}
-                return `🌍 لم أتمكن من جلب طقس ${city}، حاول مرة أخرى`;
+                } catch (e) {
+                    document.getElementById('loginScreen').style.display = 'block';
+                    document.getElementById('mainScreen').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('mainScreen').classList.add('hidden');
             }
-            
-            if (cmd.includes('مساعدة') || cmd === 'help') {
-                return `# 📖 قائمة الأوامر المتاحة
+        }
 
-**🌐 الأوامر العامة:**
-- \`افتح يوتيوب\` - فتح YouTube
-- \`افتح جوجل\` - فتح Google
-- \`افتح فيسبوك\` - فتح Facebook
-- \`شغل [اسم الأغنية]\` - تشغيل أغنية
-- \`الوقت\` - عرض الوقت الحالي
-- \`التاريخ\` - عرض التاريخ
-- \`طقس [مدينة]\` - حالة الطقس
-- \`عدد المعلومات\` - عدد المعلومات في القاعدة
-- \`المعلم\` - معلومات عن المعلم
+        function previewPhoto(input) {
+            const preview = document.getElementById('profileImg');
+            const text = document.getElementById('photoText');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    text.style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
 
-**📝 تنسيق النصوص:**
-- استخدم \`**نص**\` للنص العريض
-- استخدم \`*نص*\` للنص المائل
-- استخدم \`# عنوان\` للعناوين
-- استخدم \`- نص\` للقوائم`;
-            }
-            
-            return null;
-        }
-        
-        // ========== دوال Firebase ==========
-        async function loadCloudKnowledge() {
-            try {
-                const snapshot = await db.collection('publicKnowledge').get();
-                knowledgeBase = {};
-                snapshot.forEach(doc => {
-                    knowledgeBase[doc.id] = doc.data();
-                });
-                updateStats();
-                displayKnowledgeList();
-            } catch (error) {
-                console.error('خطأ:', error);
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ar-SA';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
             }
         }
-        
-        async function saveToCloud(question, answer, imageData, userName) {
-            if (!isTeacher) {
-                showToast('⛔ فقط المعلم يمكنه إضافة المعلومات');
-                return false;
+
+        // ========== تسجيل الدخول ==========
+        function login() {
+            const email = document.getElementById('userEmail').value.trim();
+            const password = document.getElementById('userPassword').value.trim();
+            const name = document.getElementById('userName').value.trim();
+            const profileImg = document.getElementById('profileImg').src;
+
+            if (!email || !password || !name) {
+                alert('الرجاء إدخال البريد الإلكتروني وكلمة المرور والاسم');
+                return;
             }
+
+            const saved = localStorage.getItem('user_' + email);
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                if (currentUser.password !== password) {
+                    alert('كلمة المرور غير صحيحة');
+                    return;
+                }
+                currentUser.name = name;
+                if (profileImg && profileImg !== '' && !profileImg.includes('blob:')) {
+                    currentUser.profileImage = profileImg;
+                }
+                staticKnowledge = currentUser.staticKnowledge || {};
+                updateableKnowledge = currentUser.updateableKnowledge || {};
+                multimediaKnowledge = currentUser.multimediaKnowledge || {};
+                reminders = currentUser.reminders || [];
+            } else {
+                currentUser = {
+                    email: email,
+                    password: password,
+                    name: name,
+                    profileImage: (profileImg && profileImg !== '' && !profileImg.includes('blob:')) ? profileImg : '',
+                    staticKnowledge: {},
+                    updateableKnowledge: {},
+                    multimediaKnowledge: {},
+                    reminders: []
+                };
+                staticKnowledge = {};
+                updateableKnowledge = {};
+                multimediaKnowledge = {};
+                reminders = [];
+            }
+
+            localStorage.setItem('cerebonix_session', JSON.stringify({ email: currentUser.email, timestamp: Date.now() }));
+            saveData();
+            updateUserInterface();
             
-            try {
-                await db.collection('publicKnowledge').doc(question).set({
-                    answer: answer,
-                    image: imageData || null,
-                    taughtBy: userName,
-                    taughtAt: new Date().toISOString()
-                });
-                showToast('✅ تم حفظ المعلومة في السحابة');
-                return true;
-            } catch (error) {
-                showToast('❌ خطأ في الحفظ: ' + error.message);
-                return false;
-            }
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainScreen').classList.remove('hidden');
+            
+            addMessage(`أهلاً بك يا ${currentUser.name}، أنا Cerebonix جاهز!`, 'bot');
+            updateStats();
+            updateRemindersList();
+            startReminderChecker();
         }
-        
-        async function updateInCloud(question, newAnswer, newImage) {
-            if (!isTeacher) return false;
-            
-            try {
-                const updateData = { answer: newAnswer, updatedAt: new Date().toISOString() };
-                if (newImage !== undefined) updateData.image = newImage;
-                await db.collection('publicKnowledge').doc(question).update(updateData);
-                showToast('✅ تم التحديث');
-                return true;
-            } catch (error) {
-                showToast('❌ خطأ في التحديث');
-                return false;
-            }
-        }
-        
-        async function deleteFromCloud(question) {
-            if (!isTeacher) return false;
-            
-            try {
-                await db.collection('publicKnowledge').doc(question).delete();
-                showToast('✅ تم الحذف');
-                return true;
-            } catch (error) {
-                showToast('❌ خطأ في الحذف');
-                return false;
-            }
-        }
-        
-        async function searchInCloud(question) {
-            if (knowledgeBase[question]) return knowledgeBase[question];
-            
-            for (let key in knowledgeBase) {
-                if (question.includes(key) || key.includes(question)) {
-                    return knowledgeBase[key];
+
+        function updateUserInterface() {
+            if (currentUser) {
+                document.getElementById('displayName').textContent = currentUser.name || 'مستخدم';
+                document.getElementById('displayEmail').textContent = currentUser.email || '';
+                if (currentUser.profileImage && currentUser.profileImage !== '') {
+                    document.getElementById('avatarDisplay').src = currentUser.profileImage;
+                    document.getElementById('avatarDisplay').style.display = 'block';
+                    document.getElementById('avatarText').style.display = 'none';
                 }
             }
-            return null;
         }
-        
-        // ========== دوال الواجهة ==========
-        function addMessage(text, sender, extraData = null) {
+
+        // ========== عرض الرسائل مع دعم الوسائط ==========
+        function addMessage(text, sender, media = null) {
             const chatArea = document.getElementById('chatArea');
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${sender}-message`;
@@ -1057,654 +836,401 @@
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble';
             
-            if (extraData && extraData.image) {
-                const img = document.createElement('img');
-                img.src = extraData.image;
-                img.style.maxWidth = '100%';
-                img.style.borderRadius = '15px';
-                img.style.marginBottom = '10px';
-                bubble.appendChild(img);
+            if (text) {
+                const textDiv = document.createElement('div');
+                textDiv.textContent = text;
+                bubble.appendChild(textDiv);
             }
             
-            const content = document.createElement('div');
-            content.innerHTML = formatMessage(text);
-            bubble.appendChild(content);
+            if (media) {
+                if (media.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = media.url;
+                    img.className = 'message-media';
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '200px';
+                    img.style.borderRadius = '15px';
+                    img.style.marginTop = '10px';
+                    img.style.cursor = 'pointer';
+                    img.onclick = () => window.open(media.url, '_blank');
+                    bubble.appendChild(img);
+                } else if (media.type === 'video') {
+                    let video;
+                    if (media.url.includes('youtube.com') || media.url.includes('youtu.be')) {
+                        const videoId = media.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1];
+                        if (videoId) {
+                            video = document.createElement('iframe');
+                            video.src = `https://www.youtube.com/embed/${videoId}`;
+                            video.allowFullscreen = true;
+                        }
+                    } else {
+                        video = document.createElement('video');
+                        video.src = media.url;
+                        video.controls = true;
+                    }
+                    if (video) {
+                        video.className = 'message-media video-media';
+                        video.style.width = '100%';
+                        video.style.maxHeight = '250px';
+                        video.style.borderRadius = '15px';
+                        video.style.marginTop = '10px';
+                        bubble.appendChild(video);
+                    }
+                } else if (media.type === 'audio') {
+                    const audio = document.createElement('audio');
+                    audio.src = media.url;
+                    audio.controls = true;
+                    audio.className = 'message-media audio-media';
+                    audio.style.width = '100%';
+                    audio.style.marginTop = '10px';
+                    bubble.appendChild(audio);
+                }
+                
+                if (media.caption) {
+                    const captionDiv = document.createElement('div');
+                    captionDiv.textContent = `📝 ${media.caption}`;
+                    captionDiv.style.fontSize = '12px';
+                    captionDiv.style.color = '#aaa';
+                    captionDiv.style.marginTop = '5px';
+                    bubble.appendChild(captionDiv);
+                }
+            }
             
             const time = document.createElement('div');
             time.className = 'message-time';
-            time.textContent = new Date().toLocaleTimeString('ar-SA');
-            bubble.appendChild(time);
+            time.textContent = new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
             
             msgDiv.appendChild(bubble);
+            msgDiv.appendChild(time);
+            
+            if (sender === 'bot' && text) {
+                const speakBtn = document.createElement('button');
+                speakBtn.className = 'speak-btn';
+                speakBtn.innerHTML = '🔊 استمع';
+                speakBtn.onclick = () => speak(text);
+                msgDiv.appendChild(speakBtn);
+            }
+            
             chatArea.appendChild(msgDiv);
             chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // ========== حفظ الوسائط المتعددة ==========
+        function saveMedia() {
+            const key = document.getElementById('mediaKey').value.trim();
+            const type = document.getElementById('mediaType').value;
+            const url = document.getElementById('mediaUrl').value.trim();
+            const caption = document.getElementById('mediaCaption').value.trim();
             
-            if (typeof hljs !== 'undefined') {
-                msgDiv.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                });
+            if (!key || !url) {
+                alert('الرجاء إدخال الكلمة المفتاحية ورابط الوسائط');
+                return;
             }
+            
+            multimediaKnowledge[key] = {
+                type: type,
+                url: url,
+                caption: caption
+            };
+            
+            addMessage(`✅ تم حفظ وسائط "${key}" (${type === 'image' ? 'صورة' : type === 'video' ? 'فيديو' : 'صوت'})`, 'bot');
+            
+            document.getElementById('mediaKey').value = '';
+            document.getElementById('mediaUrl').value = '';
+            document.getElementById('mediaCaption').value = '';
+            
+            saveData();
+            updateStats();
+            switchMenuTab('chat');
         }
-        
-        function showTypingIndicator() {
-            const chatArea = document.getElementById('chatArea');
-            const indicator = document.createElement('div');
-            indicator.className = 'message bot-message typing-indicator-container';
-            indicator.id = 'typingIndicator';
-            indicator.innerHTML = `<div class="message-bubble typing-indicator"><span></span><span></span><span></span></div>`;
-            chatArea.appendChild(indicator);
-            chatArea.scrollTop = chatArea.scrollHeight;
-            return indicator;
+
+        // ========== التعليم النصي ==========
+        function teachStatic() {
+            const q = document.getElementById('teachQ').value.trim();
+            const a = document.getElementById('teachA').value.trim();
+            if (q && a) {
+                staticKnowledge[q] = a;
+                addMessage(`✅ تم حفظ معلومة ثابتة: "${q}"`, 'bot');
+                document.getElementById('teachQ').value = '';
+                document.getElementById('teachA').value = '';
+                saveData();
+                updateStats();
+                switchMenuTab('chat');
+            } else alert('الرجاء إدخال السؤال والجواب');
         }
-        
-        function removeTypingIndicator(indicator) {
-            if (indicator && indicator.parentNode) indicator.remove();
-            const existing = document.getElementById('typingIndicator');
-            if (existing) existing.remove();
+
+        function teachUpdateable() {
+            const q = document.getElementById('teachQ').value.trim();
+            const a = document.getElementById('teachA').value.trim();
+            if (q && a) {
+                updateableKnowledge[q] = a;
+                addMessage(`✅ تم حفظ معلومة قابلة للتحديث: "${q}"`, 'bot');
+                document.getElementById('teachQ').value = '';
+                document.getElementById('teachA').value = '';
+                saveData();
+                updateStats();
+                switchMenuTab('chat');
+            } else alert('الرجاء إدخال السؤال والجواب');
         }
-        
+
+        // ========== إرسال الرسالة ==========
         async function sendMessage() {
             const input = document.getElementById('userMessage');
             const msg = input.value.trim();
             if (!msg) return;
             
             addMessage(msg, 'user');
+            
+            let response = null;
+            let mediaResponse = null;
+            
+            // 1. البحث في الوسائط المتعددة
+            for (let key in multimediaKnowledge) {
+                if (msg.includes(key)) {
+                    mediaResponse = multimediaKnowledge[key];
+                    response = mediaResponse.caption || `هذا هو الـ ${mediaResponse.type === 'image' ? 'صورة' : mediaResponse.type === 'video' ? 'فيديو' : 'مقطع صوتي'} لك`;
+                    break;
+                }
+            }
+            
+            // 2. البحث في المعرفة القابلة للتحديث
+            if (!response) {
+                for (let key in updateableKnowledge) {
+                    if (msg.includes(key)) {
+                        response = updateableKnowledge[key];
+                        break;
+                    }
+                }
+            }
+            
+            // 3. البحث في المعرفة الثابتة
+            if (!response) {
+                for (let key in staticKnowledge) {
+                    if (msg.includes(key)) {
+                        response = staticKnowledge[key];
+                        break;
+                    }
+                }
+            }
+            
+            // 4. البحث في المعرفة العامة
+            if (!response) {
+                for (let key in publicKnowledge) {
+                    if (msg.includes(key)) {
+                        response = publicKnowledge[key];
+                        break;
+                    }
+                }
+            }
+            
+            if (response) {
+                setTimeout(() => addMessage(response, 'bot', mediaResponse), 500);
+            } else {
+                addMessage(`📝 لم أجد "${msg}" في ذاكرتي. يمكنك تعليمي الإجابة أو إضافة صورة/فيديو/صوت من خلال قائمة "وسائط متعددة"`, 'bot');
+            }
+            
             input.value = '';
-            
-            const commandResult = await executeCommand(msg);
-            if (commandResult) {
-                setTimeout(() => addMessage(commandResult, 'bot'), 300);
-                return;
-            }
-            
-            const typingIndicator = showTypingIndicator();
-            await new Promise(r => setTimeout(r, 500));
-            
-            let result = await searchInCloud(msg);
-            removeTypingIndicator(typingIndicator);
-            
-            if (result) {
-                addMessage(result.answer, 'bot', { image: result.image });
-            } else {
-                addMessage(`📚 لم أتعلم هذا بعد يا ${currentUser?.name || 'صديقي'}.
+        }
 
-**💡 اقتراحات:**
-- اسأل بطريقة مختلفة
-- اطلب من المعلم إضافة هذه المعلومة
-- جرب كتابة \`مساعدة\` لمعرفة الأوامر المتاحة
-
-هذه المعلومات غير موجودة حالياً في قاعدة المعرفة.`, 'bot');
-            }
-        }
-        
-        let currentTeachImage = null;
-        
-        function previewTeachImage(input) {
-            const preview = document.getElementById('teachImagePreview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentTeachImage = e.target.result;
-                    preview.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 150px; border-radius: 15px;">`;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        
-        async function teachCloud() {
-            if (!isTeacher) {
-                showToast('⛔ فقط المعلم يمكنه التعليم');
-                return;
-            }
-            
-            const q = document.getElementById('teachQ').value.trim();
-            const a = document.getElementById('teachA').value.trim();
-            
-            if (!q || !a) {
-                showToast('الرجاء إدخال السؤال والجواب');
-                return;
-            }
-            
-            addMessage(`📖 جاري تعليم "${q}"...`, 'bot');
-            
-            const success = await saveToCloud(q, a, currentTeachImage, currentUser?.name);
-            
-            if (success) {
-                knowledgeBase[q] = { answer: a, image: currentTeachImage };
-                addMessage(`✅ **تم تعليم "${q}" بنجاح!**
-
-المعلومة أصبحت متاحة لجميع المستخدمين.`, 'bot');
-                document.getElementById('teachQ').value = '';
-                document.getElementById('teachA').value = '';
-                document.getElementById('teachImagePreview').innerHTML = '';
-                currentTeachImage = null;
-                updateStats();
-                displayKnowledgeList();
-            }
-            
-            switchMenuTab('chat', document.querySelector('.menu-item.active'));
-        }
-        
-        function displayKnowledgeList() {
-            const container = document.getElementById('knowledgeList');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            const sortedKeys = Object.keys(knowledgeBase).sort();
-            
-            if (sortedKeys.length === 0) {
-                container.innerHTML = '<p style="color: #666; text-align: center;">📭 لا توجد معلومات في قاعدة البيانات حالياً</p>';
-                return;
-            }
-            
-            sortedKeys.forEach(question => {
-                const data = knowledgeBase[question];
-                const div = document.createElement('div');
-                div.className = 'knowledge-item';
-                div.innerHTML = `
-                    <div class="knowledge-question">❓ ${escapeHtml(question)}</div>
-                    <div class="knowledge-answer">💡 ${escapeHtml(data.answer.substring(0, 200))}${data.answer.length > 200 ? '...' : ''}</div>
-                    ${data.image ? `<img src="${data.image}" class="knowledge-image">` : ''}
-                    ${isTeacher ? `<div style="margin-top: 10px; display: flex; gap: 10px;">
-                        <button class="teach-btn" style="width: auto; padding: 5px 15px;" onclick="editKnowledge('${escapeHtml(question).replace(/'/g, "\\'")}')">✏️ تعديل</button>
-                        <button class="teach-btn" style="width: auto; padding: 5px 15px; background: #dc3545;" onclick="deleteKnowledge('${escapeHtml(question).replace(/'/g, "\\'")}')">🗑️ حذف</button>
-                    </div>` : ''}
-                `;
-                container.appendChild(div);
-            });
-        }
-        
-        function searchKnowledge() {
-            const searchTerm = document.getElementById('searchKnowledge').value.trim().toLowerCase();
-            const container = document.getElementById('knowledgeList');
-            
-            if (!searchTerm) {
-                displayKnowledgeList();
-                return;
-            }
-            
-            const filtered = Object.keys(knowledgeBase).filter(q => 
-                q.toLowerCase().includes(searchTerm) || 
-                knowledgeBase[q].answer.toLowerCase().includes(searchTerm)
-            );
-            
-            container.innerHTML = '';
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="color: #666; text-align: center;">🔍 لا توجد نتائج مطابقة</p>';
-                return;
-            }
-            
-            filtered.forEach(question => {
-                const data = knowledgeBase[question];
-                const div = document.createElement('div');
-                div.className = 'knowledge-item';
-                div.innerHTML = `
-                    <div class="knowledge-question">❓ ${escapeHtml(question)}</div>
-                    <div class="knowledge-answer">💡 ${escapeHtml(data.answer.substring(0, 200))}${data.answer.length > 200 ? '...' : ''}</div>
-                    ${data.image ? `<img src="${data.image}" class="knowledge-image">` : ''}
-                `;
-                container.appendChild(div);
-            });
-        }
-        
-        async function editKnowledge(question) {
-            const oldData = knowledgeBase[question];
-            const newAnswer = prompt('تعديل الإجابة:', oldData.answer);
-            if (newAnswer && newAnswer !== oldData.answer) {
-                await updateInCloud(question, newAnswer, oldData.image);
-                knowledgeBase[question].answer = newAnswer;
-                displayKnowledgeList();
-                addMessage(`✅ **تم تعديل "${question}"** بنجاح`, 'bot');
-            }
-        }
-        
-        async function deleteKnowledge(question) {
-            if (confirm(`⚠️ هل أنت متأكد من حذف "${question}"؟\nهذا الإجراء لا يمكن التراجع عنه.`)) {
-                await deleteFromCloud(question);
-                delete knowledgeBase[question];
-                displayKnowledgeList();
-                updateStats();
-                addMessage(`✅ **تم حذف "${question}"** من قاعدة المعرفة`, 'bot');
-            }
-        }
-        
-        // ========== دوال المستخدم مع حفظ الجلسة بشكل صحيح ==========
-        
-        // حفظ الجلسة بالكامل
-        function saveSession() {
-            if (currentUser) {
-                // حفظ بيانات المستخدم
-                const userToSave = {
-                    email: currentUser.email,
-                    name: currentUser.name,
-                    isTeacher: currentUser.isTeacher,
-                    isGuest: currentUser.isGuest || false,
-                    lastLogin: new Date().toISOString()
-                };
-                localStorage.setItem('cerebonix_user', JSON.stringify(userToSave));
-                
-                // حفظ التذكيرات بشكل منفصل
-                if (reminders.length > 0) {
-                    localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
-                }
-                
-                // حفظ علامة أن الجلسة نشطة
-                localStorage.setItem('cerebonix_session_active', 'true');
-                localStorage.setItem('cerebonix_last_active', new Date().toISOString());
-                
-                // إظهار مؤشر للمستخدم
-                const badge = document.getElementById('autoLoginBadge');
-                if (badge) {
-                    badge.textContent = '🔐 تم حفظ جلستك';
-                    badge.style.opacity = '0.7';
-                    setTimeout(() => {
-                        badge.style.opacity = '0';
-                    }, 3000);
-                }
-            }
-        }
-        
-        // استعادة الجلسة المحفوظة
-        async function restoreSavedSession() {
-            const savedUserStr = localStorage.getItem('cerebonix_user');
-            const sessionActive = localStorage.getItem('cerebonix_session_active');
-            
-            if (savedUserStr && sessionActive === 'true') {
-                try {
-                    const savedUser = JSON.parse(savedUserStr);
-                    
-                    // التحقق من صلاحية الجلسة (مثلاً 30 يوم)
-                    const lastActive = localStorage.getItem('cerebonix_last_active');
-                    if (lastActive) {
-                        const lastActiveDate = new Date(lastActive);
-                        const now = new Date();
-                        const daysDiff = (now - lastActiveDate) / (1000 * 60 * 60 * 24);
-                        
-                        // إذا مر أكثر من 30 يوم، نطلب إعادة تسجيل دخول
-                        if (daysDiff > 30) {
-                            localStorage.removeItem('cerebonix_session_active');
-                            return false;
-                        }
-                    }
-                    
-                    // استعادة المستخدم
-                    currentUser = {
-                        email: savedUser.email,
-                        name: savedUser.name,
-                        isTeacher: savedUser.isTeacher || (savedUser.email === TEACHER_EMAIL),
-                        isGuest: savedUser.isGuest || false,
-                        reminders: []
-                    };
-                    
-                    isTeacher = currentUser.isTeacher || (currentUser.email === TEACHER_EMAIL);
-                    
-                    // استعادة التذكيرات
-                    const savedReminders = localStorage.getItem(`cerebonix_reminders_${currentUser.email}`);
-                    if (savedReminders) {
-                        try {
-                            reminders = JSON.parse(savedReminders);
-                            currentUser.reminders = reminders;
-                        } catch(e) {}
-                    }
-                    
-                    // تحديث شاشة الدخول بالبيانات المحفوظة
-                    if (!currentUser.isGuest) {
-                        document.getElementById('userEmail').value = currentUser.email;
-                        document.getElementById('userName').value = currentUser.name;
-                        document.getElementById('rememberMe').checked = true;
-                    }
-                    
-                    // تسجيل الدخول التلقائي
-                    await completeLogin();
-                    
-                    showToast('👋 مرحباً بعودتك! تم تسجيل الدخول تلقائياً');
-                    return true;
-                    
-                } catch(e) {
-                    console.error('خطأ في استعادة الجلسة:', e);
-                    localStorage.removeItem('cerebonix_session_active');
-                    return false;
-                }
-            }
-            return false;
-        }
-        
-        async function login() {
-            const email = document.getElementById('userEmail').value.trim();
-            const password = document.getElementById('userPassword').value.trim();
-            const name = document.getElementById('userName').value.trim();
-            const rememberMe = document.getElementById('rememberMe').checked;
-            
-            if (!email || !password || !name) {
-                showToast('⚠️ الرجاء إدخال جميع البيانات');
-                return;
-            }
-            
-            isTeacher = (email === TEACHER_EMAIL);
-            
-            currentUser = {
-                email: email,
-                name: name,
-                isTeacher: isTeacher,
-                reminders: [],
-                isGuest: false,
-                lastLogin: new Date().toISOString()
-            };
-            
-            if (rememberMe) {
-                saveSession();
-            }
-            
-            await completeLogin();
-        }
-        
-        async function loginAsGuest() {
-            currentUser = {
-                email: 'guest_' + Date.now() + '@cerebonix.local',
-                name: 'زائر',
-                isTeacher: false,
-                reminders: [],
-                isGuest: true,
-                lastLogin: new Date().toISOString()
-            };
-            isTeacher = false;
-            
-            // حفظ جلسة الزائر
-            saveSession();
-            await completeLogin();
-        }
-        
-        async function completeLogin() {
-            reminders = currentUser.reminders || [];
-            
-            // تحميل التذكيرات المحفوظة
-            if (!currentUser.isGuest && localStorage.getItem(`cerebonix_reminders_${currentUser.email}`)) {
-                try {
-                    const savedReminders = JSON.parse(localStorage.getItem(`cerebonix_reminders_${currentUser.email}`));
-                    reminders = savedReminders;
-                    currentUser.reminders = reminders;
-                } catch(e) {}
-            }
-            
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainScreen').classList.remove('hidden');
-            
-            document.getElementById('displayName').textContent = currentUser.name;
-            document.getElementById('displayEmail').textContent = currentUser.isGuest ? 'زائر' : currentUser.email;
-            
-            const avatarDiv = document.getElementById('userAvatar');
-            if (currentUser.name) {
-                const initial = currentUser.name.charAt(0).toUpperCase();
-                avatarDiv.innerHTML = `<span style="font-size: 24px;">${initial}</span>`;
-            }
-            
-            const teachMenuItem = document.getElementById('teachMenuItem');
-            if (isTeacher) {
-                teachMenuItem.classList.remove('disabled');
-            } else {
-                teachMenuItem.classList.add('disabled');
-            }
-            
-            await loadCloudKnowledge();
-            
-            if (isTeacher) {
-                addMessage(`# 👨‍🏫 مرحباً أيها المعلم ${currentUser.name}!
-
-**✨ صلاحياتك الخاصة:**
-- ✅ إضافة معلومات جديدة إلى قاعدة المعرفة
-- ✅ تعديل وحذف المعلومات الموجودة
-- ✅ الوصول إلى لوحة التحكم الكاملة
-
-**💡 نصيحة:** استخدم Markdown لتنسيق الإجابات وجعلها أكثر احترافية!`, 'bot');
-            } else {
-                addMessage(`# 👋 مرحباً ${currentUser.name}!
-
-**🌍 أنت الآن متصل بالذاكرة السحابية المشتركة**
-
-يمكنك:
-- 💬 سؤالي عن أي شيء في قاعدة المعرفة
-- 🎵 استخدام الأوامر مثل "افتح يوتيوب" أو "شغل أغنية"
-- ⏰ إضافة تذكيرات للمواعيد المهمة
-- 📝 كتابة \`مساعدة\` لمعرفة جميع الأوامر
-
-**ماذا تريد أن تسأل اليوم؟**`, 'bot');
-            }
-            
-            updateStats();
-            updateRemindersList();
-            startReminderChecker();
-            
-            document.getElementById('onlineCount').textContent = Math.floor(Math.random() * 20) + 5;
-        }
-        
-        function updateStats() {
-            document.getElementById('knowledgeCount').textContent = Object.keys(knowledgeBase).length;
-        }
-        
-        function logout() {
-            if (currentUser && !currentUser.isGuest && reminders.length > 0) {
-                localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
-            }
-            
-            // مسح جلسة المستخدم الحالي فقط
-            localStorage.removeItem('cerebonix_session_active');
-            if (currentUser && !currentUser.isGuest) {
-                localStorage.removeItem('cerebonix_user');
-            } else if (currentUser && currentUser.isGuest) {
-                localStorage.removeItem('cerebonix_user');
-            }
-            
-            currentUser = null;
-            isTeacher = false;
-            reminders = [];
-            if (reminderInterval) clearInterval(reminderInterval);
-            
-            document.getElementById('mainScreen').classList.add('hidden');
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('userEmail').value = '';
-            document.getElementById('userPassword').value = '';
-            document.getElementById('userName').value = '';
-            document.getElementById('rememberMe').checked = true;
-            showToast('👋 تم تسجيل الخروج بنجاح');
-        }
-        
-        // ========== دوال التذكيرات ==========
+        // ========== التذكيرات ==========
         function addReminder() {
             const text = document.getElementById('reminderText').value.trim();
             const time = document.getElementById('reminderTime').value;
-            
             if (text && time) {
-                reminders.push({
-                    id: Date.now(),
-                    text: text,
-                    time: time,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                });
-                if (currentUser) {
-                    currentUser.reminders = reminders;
-                    localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
-                }
+                reminders.push({ id: Date.now(), text: text, time: time, completed: false });
+                saveData();
                 updateRemindersList();
                 document.getElementById('reminderText').value = '';
                 document.getElementById('reminderTime').value = '';
-                addMessage(`✅ **تم إضافة تذكير:** "${text}" في ${new Date(time).toLocaleString('ar-SA')}`, 'bot');
+                addMessage(`✅ تم إضافة تذكير: "${text}"`, 'bot');
+                switchMenuTab('chat');
             } else {
-                showToast('⚠️ الرجاء إدخال نص التذكير والوقت');
+                alert('الرجاء إدخال نص التذكير والوقت');
             }
         }
-        
+
         function updateRemindersList() {
             const list = document.getElementById('remindersList');
             if (!list) return;
-            
             list.innerHTML = '';
             const now = new Date();
-            const upcomingReminders = reminders.filter(r => !r.completed && new Date(r.time) > now);
-            const pastReminders = reminders.filter(r => !r.completed && new Date(r.time) <= now);
-            
-            if (upcomingReminders.length === 0 && pastReminders.length === 0) {
-                list.innerHTML = '<p style="color: #666; text-align: center;">📭 لا توجد تذكيرات نشطة</p>';
+            const activeReminders = reminders.filter(r => !r.completed && new Date(r.time) > now);
+            if (activeReminders.length === 0) {
+                list.innerHTML = '<p style="color: #666; text-align: center;">لا توجد تذكيرات نشطة</p>';
                 return;
             }
-            
-            if (upcomingReminders.length > 0) {
-                const upcomingDiv = document.createElement('div');
-                upcomingDiv.innerHTML = '<h4 style="color: var(--accent-gold); margin: 10px 0;">⏰ التذكيرات القادمة</h4>';
-                list.appendChild(upcomingDiv);
-                
-                upcomingReminders.forEach(reminder => {
-                    const div = document.createElement('div');
-                    div.className = 'knowledge-item';
-                    div.innerHTML = `
-                        <div><strong>${escapeHtml(reminder.text)}</strong></div>
-                        <small>📅 ${new Date(reminder.time).toLocaleString('ar-SA')}</small>
-                        <button class="teach-btn" style="width: auto; padding: 5px 10px; margin-top: 5px; background: #dc3545;" onclick="deleteReminder(${reminder.id})">❌ حذف</button>
-                    `;
-                    list.appendChild(div);
-                });
-            }
-            
-            if (pastReminders.length > 0) {
-                const pastDiv = document.createElement('div');
-                pastDiv.innerHTML = '<h4 style="color: #ff9500; margin: 10px 0;">⏰ تذكيرات فائتة</h4>';
-                list.appendChild(pastDiv);
-                
-                pastReminders.forEach(reminder => {
-                    const div = document.createElement('div');
-                    div.className = 'knowledge-item';
-                    div.style.borderRightColor = '#ff9500';
-                    div.innerHTML = `
-                        <div><strong>${escapeHtml(reminder.text)}</strong></div>
-                        <small>📅 ${new Date(reminder.time).toLocaleString('ar-SA')}</small>
-                        <button class="teach-btn" style="width: auto; padding: 5px 10px; margin-top: 5px;" onclick="deleteReminder(${reminder.id})">🗑️ حذف</button>
-                    `;
-                    list.appendChild(div);
-                });
-            }
+            activeReminders.forEach(reminder => {
+                const div = document.createElement('div');
+                div.className = 'reminder-item';
+                div.innerHTML = `
+                    <span style="flex:1">${reminder.text}</span>
+                    <small>${new Date(reminder.time).toLocaleString('ar-SA')}</small>
+                    <button class="delete-btn" onclick="deleteReminder(${reminder.id})">❌</button>
+                `;
+                list.appendChild(div);
+            });
         }
-        
+
         function deleteReminder(id) {
             reminders = reminders.filter(r => r.id !== id);
-            if (currentUser) {
-                currentUser.reminders = reminders;
-                localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
-            }
+            saveData();
             updateRemindersList();
-            showToast('✅ تم حذف التذكير');
         }
-        
+
         function startReminderChecker() {
             if (reminderInterval) clearInterval(reminderInterval);
             reminderInterval = setInterval(() => {
                 const now = new Date();
-                let hasNewReminder = false;
                 reminders.forEach(reminder => {
-                    const reminderTime = new Date(reminder.time);
-                    if (reminderTime <= now && !reminder.completed) {
-                        addMessage(`# ⏰ **تذكير مهم!**
-                        
-**📝 ${reminder.text}**
-
-🕐 الوقت: ${reminderTime.toLocaleString('ar-SA')}`, 'bot');
+                    if (new Date(reminder.time) <= now && !reminder.completed) {
+                        addMessage(`⏰ تذكير: ${reminder.text}`, 'bot');
                         reminder.completed = true;
-                        hasNewReminder = true;
                     }
                 });
-                if (hasNewReminder && currentUser) {
-                    currentUser.reminders = reminders;
-                    localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
-                    updateRemindersList();
-                }
-            }, 30000);
+                saveData();
+                updateRemindersList();
+            }, 60000);
         }
-        
-        // ========== دوال القائمة والصوت ==========
+
+        function saveData() {
+            if (currentUser) {
+                currentUser.staticKnowledge = staticKnowledge;
+                currentUser.updateableKnowledge = updateableKnowledge;
+                currentUser.multimediaKnowledge = multimediaKnowledge;
+                currentUser.reminders = reminders;
+                localStorage.setItem('user_' + currentUser.email, JSON.stringify(currentUser));
+                localStorage.setItem('cerebonix_session', JSON.stringify({ email: currentUser.email, timestamp: Date.now() }));
+            }
+        }
+
+        function updateStats() {
+            const textCount = Object.keys(staticKnowledge).length + Object.keys(updateableKnowledge).length;
+            const mediaCount = Object.keys(multimediaKnowledge).length;
+            document.getElementById('knowledgeCount').textContent = textCount;
+            document.getElementById('mediaCount').textContent = mediaCount;
+        }
+
+        // ========== القائمة ==========
         function toggleMenu() {
-            document.getElementById('sideMenu').classList.toggle('show');
+            if (window.innerWidth < 1024) {
+                document.getElementById('sideMenu').classList.toggle('show');
+            }
         }
-        
-        function switchMenuTab(tab, element) {
-            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-            if (element) element.classList.add('active');
+
+        function switchMenuTab(tab) {
+            const items = document.querySelectorAll('.menu-item');
+            items.forEach(item => item.classList.remove('active'));
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
             
             document.getElementById('chatArea').classList.add('hidden');
             document.getElementById('teachPanel').classList.add('hidden');
-            document.getElementById('knowledgePanel').classList.add('hidden');
+            document.getElementById('multimediaPanel').classList.add('hidden');
             document.getElementById('remindersPanel').classList.add('hidden');
             
-            if (tab === 'chat') {
-                document.getElementById('chatArea').classList.remove('hidden');
-            } else if (tab === 'teach') {
-                if (isTeacher) {
-                    document.getElementById('teachPanel').classList.remove('hidden');
-                } else {
-                    showToast('⛔ فقط المعلم يمكنه الوصول إلى هذه الصفحة');
-                    switchMenuTab('chat', document.querySelector('.menu-item.active'));
-                }
-            } else if (tab === 'knowledge') {
-                document.getElementById('knowledgePanel').classList.remove('hidden');
-                displayKnowledgeList();
-            } else if (tab === 'reminders') {
+            if (tab === 'chat') document.getElementById('chatArea').classList.remove('hidden');
+            else if (tab === 'teach') document.getElementById('teachPanel').classList.remove('hidden');
+            else if (tab === 'multimedia') document.getElementById('multimediaPanel').classList.remove('hidden');
+            else if (tab === 'reminders') {
                 document.getElementById('remindersPanel').classList.remove('hidden');
                 updateRemindersList();
             }
-            toggleMenu();
+            if (window.innerWidth < 1024) toggleMenu();
         }
-        
-        function startVoiceInput() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                showToast('❌ متصفحك لا يدعم الإدخال الصوتي');
-                return;
-            }
-            
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ar-SA';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            
-            recognition.onstart = () => {
-                showToast('🎙️ جاري الاستماع... تحدث الآن');
-            };
-            
-            recognition.onresult = (event) => {
-                const text = event.results[0][0].transcript;
-                document.getElementById('userMessage').value = text;
-                sendMessage();
-            };
-            
-            recognition.onerror = (event) => {
-                console.error('Speech error:', event.error);
-                showToast('❌ لم يتم التعرف على الصوت، حاول مرة أخرى');
-            };
-            
-            recognition.start();
+
+        function toggleLanguage() {
+            const html = document.documentElement;
+            html.lang = html.lang === 'ar' ? 'en' : 'ar';
+            html.dir = html.lang === 'ar' ? 'rtl' : 'ltr';
+            if (window.innerWidth < 1024) toggleMenu();
         }
-        
-        // ========== بدء التطبيق واستعادة الجلسة ==========
-        document.addEventListener('DOMContentLoaded', async () => {
-            // محاولة استعادة الجلسة المحفوظة
-            const restored = await restoreSavedSession();
-            
-            if (!restored) {
-                // إذا لم توجد جلسة محفوظة، نظهر شاشة الدخول
-                document.getElementById('loginScreen').style.display = 'block';
-                document.getElementById('mainScreen').classList.add('hidden');
+
+        function confirmLogout() {
+            if (window.innerWidth < 1024) toggleMenu();
+            document.getElementById('passwordModal').classList.remove('hidden');
+        }
+
+        function hidePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+            document.getElementById('logoutPassword').value = '';
+        }
+
+        function verifyAndLogout() {
+            const password = document.getElementById('logoutPassword').value.trim();
+            if (password === '1234') {
+                logout();
+            } else {
+                alert('كلمة المرور غير صحيحة');
             }
-        });
-        
-        // حفظ الجلسة بشكل دوري (كل دقيقة)
-        setInterval(() => {
-            if (currentUser) {
-                saveSession();
+        }
+
+        function logout() {
+            if (currentUser) saveData();
+            localStorage.removeItem('cerebonix_session');
+            document.getElementById('mainScreen').classList.add('hidden');
+            document.getElementById('loginScreen').style.display = 'block';
+            if (reminderInterval) clearInterval(reminderInterval);
+            hidePasswordModal();
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userEmail').value = '';
+            document.getElementById('userName').value = '';
+            document.getElementById('profileImg').src = '';
+            document.getElementById('profileImg').style.display = 'none';
+            document.getElementById('photoText').style.display = 'block';
+            currentUser = null;
+            staticKnowledge = {};
+            updateableKnowledge = {};
+            multimediaKnowledge = {};
+            reminders = [];
+        }
+
+        // ========== التسجيل الصوتي ==========
+        async function toggleVoiceRecording() {
+            const voiceBtn = document.getElementById('voiceBtn');
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    let audioChunks = [];
+                    mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        convertAudioToText(audioBlob);
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    mediaRecorder.start();
+                    isRecording = true;
+                    voiceBtn.classList.add('recording');
+                    voiceBtn.innerHTML = '⏹️';
+                } catch {
+                    alert('لا يمكن الوصول إلى الميكروفون');
+                }
+            } else {
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceBtn.innerHTML = '🎤';
             }
-        }, 60000);
-        
-        // حفظ الجلسة قبل إغلاق الصفحة
-        window.addEventListener('beforeunload', () => {
-            if (currentUser) {
-                saveSession();
+        }
+
+        function convertAudioToText(audioBlob) {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'ar-SA';
+                recognition.onresult = function(event) {
+                    document.getElementById('userMessage').value = event.results[0][0].transcript;
+                    sendMessage();
+                };
+                recognition.start();
+            } else {
+                alert('ميزة التعرف على الصوت غير مدعومة');
+            }
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1024) {
+                document.getElementById('sideMenu').classList.add('show');
+            } else {
+                document.getElementById('sideMenu').classList.remove('show');
             }
         });
     </script>
