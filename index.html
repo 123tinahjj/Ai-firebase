@@ -13,11 +13,12 @@
     <!-- Markdown Library -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
-    <!-- Highlight.js لتحسين تنسيق الكود -->
+    <!-- Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     
     <style>
+        /* نفس الأنماط الموجودة - لم تتغير */
         * {
             margin: 0;
             padding: 0;
@@ -713,7 +714,7 @@
             </label>
         </div>
 
-        <button class="login-premium-btn" onclick="login()">🚀 ابدأ رحلتك</button>
+        <button class="login-premium-btn" onclick="realLogin()">🚀 ابدأ رحلتك</button>
         <button class="guest-btn" onclick="loginAsGuest()">👋 دخول كزائر</button>
 
         <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
@@ -823,6 +824,7 @@
         
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
         
         // ========== المتغيرات ==========
         let knowledgeBase = {};
@@ -984,12 +986,21 @@
                 updateStats();
                 displayKnowledgeList();
             } catch (error) {
-                console.error('خطأ:', error);
+                console.error('خطأ في تحميل البيانات:', error);
+                showToast('⚠️ مشكلة في الاتصال بقاعدة البيانات');
             }
         }
         
         async function saveToCloud(question, answer, imageData, userName) {
-            if (!isTeacher) {
+            // التحقق من أن المستخدم هو المعلم عبر Firebase Auth
+            const currentAuthUser = auth.currentUser;
+            
+            if (!currentAuthUser) {
+                showToast('⛔ يجب تسجيل الدخول أولاً');
+                return false;
+            }
+            
+            if (currentAuthUser.email !== TEACHER_EMAIL) {
                 showToast('⛔ فقط المعلم يمكنه إضافة المعلومات');
                 return false;
             }
@@ -999,6 +1010,7 @@
                     answer: answer,
                     image: imageData || null,
                     taughtBy: userName,
+                    taughtByEmail: currentAuthUser.email,
                     taughtAt: new Date().toISOString()
                 });
                 showToast('✅ تم حفظ المعلومة في السحابة');
@@ -1010,7 +1022,12 @@
         }
         
         async function updateInCloud(question, newAnswer, newImage) {
-            if (!isTeacher) return false;
+            const currentAuthUser = auth.currentUser;
+            
+            if (!currentAuthUser || currentAuthUser.email !== TEACHER_EMAIL) {
+                showToast('⛔ فقط المعلم يمكنه التعديل');
+                return false;
+            }
             
             try {
                 const updateData = { answer: newAnswer, updatedAt: new Date().toISOString() };
@@ -1019,20 +1036,25 @@
                 showToast('✅ تم التحديث');
                 return true;
             } catch (error) {
-                showToast('❌ خطأ في التحديث');
+                showToast('❌ خطأ في التحديث: ' + error.message);
                 return false;
             }
         }
         
         async function deleteFromCloud(question) {
-            if (!isTeacher) return false;
+            const currentAuthUser = auth.currentUser;
+            
+            if (!currentAuthUser || currentAuthUser.email !== TEACHER_EMAIL) {
+                showToast('⛔ فقط المعلم يمكنه الحذف');
+                return false;
+            }
             
             try {
                 await db.collection('publicKnowledge').doc(question).delete();
                 showToast('✅ تم الحذف');
                 return true;
             } catch (error) {
-                showToast('❌ خطأ في الحذف');
+                showToast('❌ خطأ في الحذف: ' + error.message);
                 return false;
             }
         }
@@ -1268,31 +1290,111 @@
             }
         }
         
-        // ========== دوال المستخدم مع حفظ الجلسة بشكل صحيح ==========
+        // ========== دوال تسجيل الدخول باستخدام Firebase Auth ==========
+        
+        // تسجيل دخول حقيقي إلى Firebase Authentication
+        async function realLogin() {
+            const email = document.getElementById('userEmail').value.trim();
+            const password = document.getElementById('userPassword').value.trim();
+            const name = document.getElementById('userName').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            if (!email || !password || !name) {
+                showToast('⚠️ الرجاء إدخال جميع البيانات');
+                return;
+            }
+            
+            try {
+                // محاولة تسجيل الدخول إذا كان المستخدم موجوداً
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                await handleSuccessfulLogin(userCredential.user, name, email, rememberMe);
+            } catch (error) {
+                if (error.code === 'auth/user-not-found') {
+                    // إذا لم يكن موجوداً، قم بإنشاء حساب جديد
+                    try {
+                        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                        // تحديث اسم المستخدم
+                        await userCredential.user.updateProfile({ displayName: name });
+                        await handleSuccessfulLogin(userCredential.user, name, email, rememberMe);
+                    } catch (createError) {
+                        showToast('❌ خطأ في إنشاء الحساب: ' + createError.message);
+                    }
+                } else if (error.code === 'auth/wrong-password') {
+                    showToast('❌ كلمة المرور غير صحيحة');
+                } else {
+                    showToast('❌ خطأ في تسجيل الدخول: ' + error.message);
+                }
+            }
+        }
+        
+        async function handleSuccessfulLogin(firebaseUser, name, email, rememberMe) {
+            const isTeacherAccount = (email === TEACHER_EMAIL);
+            
+            currentUser = {
+                email: email,
+                name: name,
+                isTeacher: isTeacherAccount,
+                uid: firebaseUser.uid,
+                isGuest: false,
+                lastLogin: new Date().toISOString()
+            };
+            
+            isTeacher = isTeacherAccount;
+            
+            if (rememberMe) {
+                saveSession();
+            }
+            
+            await completeLogin();
+        }
+        
+        // تسجيل دخول كزائر (مع Firebase Auth)
+        async function loginAsGuest() {
+            try {
+                // إنشاء حساب زائر مؤقت
+                const guestEmail = `guest_${Date.now()}_${Math.random().toString(36).slice(-6)}@temp.cerebonix.com`;
+                const guestPassword = Math.random().toString(36).slice(-12);
+                
+                const userCredential = await auth.createUserWithEmailAndPassword(guestEmail, guestPassword);
+                
+                currentUser = {
+                    email: guestEmail,
+                    name: 'زائر',
+                    isTeacher: false,
+                    uid: userCredential.user.uid,
+                    isGuest: true,
+                    lastLogin: new Date().toISOString()
+                };
+                
+                isTeacher = false;
+                saveSession();
+                await completeLogin();
+            } catch (error) {
+                console.error('خطأ في إنشاء مستخدم زائر:', error);
+                showToast('❌ خطأ في الدخول كزائر: ' + error.message);
+            }
+        }
         
         // حفظ الجلسة بالكامل
         function saveSession() {
             if (currentUser) {
-                // حفظ بيانات المستخدم
                 const userToSave = {
                     email: currentUser.email,
                     name: currentUser.name,
                     isTeacher: currentUser.isTeacher,
                     isGuest: currentUser.isGuest || false,
+                    uid: currentUser.uid,
                     lastLogin: new Date().toISOString()
                 };
                 localStorage.setItem('cerebonix_user', JSON.stringify(userToSave));
                 
-                // حفظ التذكيرات بشكل منفصل
                 if (reminders.length > 0) {
                     localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
                 }
                 
-                // حفظ علامة أن الجلسة نشطة
                 localStorage.setItem('cerebonix_session_active', 'true');
                 localStorage.setItem('cerebonix_last_active', new Date().toISOString());
                 
-                // إظهار مؤشر للمستخدم
                 const badge = document.getElementById('autoLoginBadge');
                 if (badge) {
                     badge.textContent = '🔐 تم حفظ جلستك';
@@ -1304,120 +1406,9 @@
             }
         }
         
-        // استعادة الجلسة المحفوظة
-        async function restoreSavedSession() {
-            const savedUserStr = localStorage.getItem('cerebonix_user');
-            const sessionActive = localStorage.getItem('cerebonix_session_active');
-            
-            if (savedUserStr && sessionActive === 'true') {
-                try {
-                    const savedUser = JSON.parse(savedUserStr);
-                    
-                    // التحقق من صلاحية الجلسة (مثلاً 30 يوم)
-                    const lastActive = localStorage.getItem('cerebonix_last_active');
-                    if (lastActive) {
-                        const lastActiveDate = new Date(lastActive);
-                        const now = new Date();
-                        const daysDiff = (now - lastActiveDate) / (1000 * 60 * 60 * 24);
-                        
-                        // إذا مر أكثر من 30 يوم، نطلب إعادة تسجيل دخول
-                        if (daysDiff > 30) {
-                            localStorage.removeItem('cerebonix_session_active');
-                            return false;
-                        }
-                    }
-                    
-                    // استعادة المستخدم
-                    currentUser = {
-                        email: savedUser.email,
-                        name: savedUser.name,
-                        isTeacher: savedUser.isTeacher || (savedUser.email === TEACHER_EMAIL),
-                        isGuest: savedUser.isGuest || false,
-                        reminders: []
-                    };
-                    
-                    isTeacher = currentUser.isTeacher || (currentUser.email === TEACHER_EMAIL);
-                    
-                    // استعادة التذكيرات
-                    const savedReminders = localStorage.getItem(`cerebonix_reminders_${currentUser.email}`);
-                    if (savedReminders) {
-                        try {
-                            reminders = JSON.parse(savedReminders);
-                            currentUser.reminders = reminders;
-                        } catch(e) {}
-                    }
-                    
-                    // تحديث شاشة الدخول بالبيانات المحفوظة
-                    if (!currentUser.isGuest) {
-                        document.getElementById('userEmail').value = currentUser.email;
-                        document.getElementById('userName').value = currentUser.name;
-                        document.getElementById('rememberMe').checked = true;
-                    }
-                    
-                    // تسجيل الدخول التلقائي
-                    await completeLogin();
-                    
-                    showToast('👋 مرحباً بعودتك! تم تسجيل الدخول تلقائياً');
-                    return true;
-                    
-                } catch(e) {
-                    console.error('خطأ في استعادة الجلسة:', e);
-                    localStorage.removeItem('cerebonix_session_active');
-                    return false;
-                }
-            }
-            return false;
-        }
-        
-        async function login() {
-            const email = document.getElementById('userEmail').value.trim();
-            const password = document.getElementById('userPassword').value.trim();
-            const name = document.getElementById('userName').value.trim();
-            const rememberMe = document.getElementById('rememberMe').checked;
-            
-            if (!email || !password || !name) {
-                showToast('⚠️ الرجاء إدخال جميع البيانات');
-                return;
-            }
-            
-            isTeacher = (email === TEACHER_EMAIL);
-            
-            currentUser = {
-                email: email,
-                name: name,
-                isTeacher: isTeacher,
-                reminders: [],
-                isGuest: false,
-                lastLogin: new Date().toISOString()
-            };
-            
-            if (rememberMe) {
-                saveSession();
-            }
-            
-            await completeLogin();
-        }
-        
-        async function loginAsGuest() {
-            currentUser = {
-                email: 'guest_' + Date.now() + '@cerebonix.local',
-                name: 'زائر',
-                isTeacher: false,
-                reminders: [],
-                isGuest: true,
-                lastLogin: new Date().toISOString()
-            };
-            isTeacher = false;
-            
-            // حفظ جلسة الزائر
-            saveSession();
-            await completeLogin();
-        }
-        
         async function completeLogin() {
             reminders = currentUser.reminders || [];
             
-            // تحميل التذكيرات المحفوظة
             if (!currentUser.isGuest && localStorage.getItem(`cerebonix_reminders_${currentUser.email}`)) {
                 try {
                     const savedReminders = JSON.parse(localStorage.getItem(`cerebonix_reminders_${currentUser.email}`));
@@ -1481,17 +1472,19 @@
             document.getElementById('knowledgeCount').textContent = Object.keys(knowledgeBase).length;
         }
         
-        function logout() {
+        async function logout() {
             if (currentUser && !currentUser.isGuest && reminders.length > 0) {
                 localStorage.setItem(`cerebonix_reminders_${currentUser.email}`, JSON.stringify(reminders));
             }
             
-            // مسح جلسة المستخدم الحالي فقط
             localStorage.removeItem('cerebonix_session_active');
-            if (currentUser && !currentUser.isGuest) {
-                localStorage.removeItem('cerebonix_user');
-            } else if (currentUser && currentUser.isGuest) {
-                localStorage.removeItem('cerebonix_user');
+            localStorage.removeItem('cerebonix_user');
+            
+            // تسجيل الخروج من Firebase Auth
+            try {
+                await auth.signOut();
+            } catch(e) {
+                console.error('خطأ في تسجيل الخروج من Firebase:', e);
             }
             
             currentUser = null;
@@ -1682,19 +1675,48 @@
             recognition.start();
         }
         
-        // ========== بدء التطبيق واستعادة الجلسة ==========
-        document.addEventListener('DOMContentLoaded', async () => {
-            // محاولة استعادة الجلسة المحفوظة
-            const restored = await restoreSavedSession();
-            
-            if (!restored) {
-                // إذا لم توجد جلسة محفوظة، نظهر شاشة الدخول
-                document.getElementById('loginScreen').style.display = 'block';
-                document.getElementById('mainScreen').classList.add('hidden');
+        // ========== مراقبة حالة المصادقة من Firebase ==========
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                // المستخدم مسجل دخوله في Firebase
+                if (!currentUser) {
+                    // محاولة استعادة بيانات المستخدم من localStorage
+                    const savedUser = localStorage.getItem('cerebonix_user');
+                    if (savedUser) {
+                        try {
+                            const userData = JSON.parse(savedUser);
+                            currentUser = {
+                                email: user.email,
+                                name: userData.name || user.displayName || 'مستخدم',
+                                isTeacher: (user.email === TEACHER_EMAIL),
+                                uid: user.uid,
+                                isGuest: userData.isGuest || false,
+                                lastLogin: new Date().toISOString()
+                            };
+                            isTeacher = (user.email === TEACHER_EMAIL);
+                            await completeLogin();
+                        } catch(e) {
+                            console.error('خطأ في استعادة بيانات المستخدم:', e);
+                        }
+                    }
+                }
+            } else {
+                // المستخدم غير مسجل دخوله
+                if (currentUser) {
+                    // تم تسجيل الخروج من Firebase
+                    logout();
+                }
             }
         });
         
-        // حفظ الجلسة بشكل دوري (كل دقيقة)
+        // ========== بدء التطبيق ==========
+        document.addEventListener('DOMContentLoaded', async () => {
+            // نعرض شاشة الدخول لحين تحقق Firebase من حالة المستخدم
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('mainScreen').classList.add('hidden');
+        });
+        
+        // حفظ الجلسة بشكل دوري
         setInterval(() => {
             if (currentUser) {
                 saveSession();
