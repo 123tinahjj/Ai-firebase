@@ -45,53 +45,83 @@
             font-family: var(--font-family);
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 12px;
+            padding: 0;
+            margin: 0;
         }
 
+        /* جعل التطبيق يملأ الشاشة بالكامل مثل تطبيق هاتف */
         .app-container {
-            max-width: 1300px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
             background: var(--card-bg);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border-radius: 0;
+            box-shadow: none;
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 24px);
+            height: 100vh;
+            width: 100%;
             overflow: hidden;
-            border: 1px solid var(--border-light);
+            border: none;
+        }
+
+        /* على الحواسيب نعطي حدود وحجم لطيف */
+        @media (min-width: 1024px) {
+            body {
+                padding: 12px;
+                background: var(--bg-body);
+            }
+            .app-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                border-radius: 40px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+                border: 1px solid var(--border-light);
+                height: calc(100vh - 24px);
+            }
+        }
+
+        /* على الهواتف يأخذ كامل الشاشة */
+        @media (max-width: 1023px) {
+            .app-container {
+                border-radius: 0;
+                height: 100vh;
+            }
+            body {
+                padding: 0;
+            }
         }
 
         .header {
-            padding: 16px 20px;
+            padding: 14px 18px;
             background: var(--surface);
             border-bottom: 1px solid var(--border-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .logo-icon {
             background: var(--accent);
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
+            width: 42px;
+            height: 42px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 24px;
         }
 
         .logo-text {
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             background: linear-gradient(135deg, #f59e0b, #ea580c);
             -webkit-background-clip: text;
             background-clip: text;
@@ -100,17 +130,17 @@
 
         .badge {
             background: linear-gradient(135deg, #10b981, #059669);
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             color: white;
-            margin-right: 10px;
+            margin-right: 8px;
         }
 
         .controls {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
             flex-wrap: wrap;
         }
@@ -118,9 +148,9 @@
         .icon-btn {
             background: var(--border-light);
             border: none;
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-radius: 40px;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 500;
             color: var(--text-primary);
             cursor: pointer;
@@ -132,15 +162,11 @@
             color: white;
         }
 
-        .icon-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         .main-layout {
             display: flex;
             flex: 1;
             overflow: hidden;
+            position: relative;
         }
 
         .sidebar {
@@ -150,7 +176,8 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            transition: transform 0.2s ease;
+            transition: transform 0.25s ease;
+            z-index: 20;
         }
 
         .menu-item {
@@ -182,10 +209,10 @@
         .chat-window {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
 
         .message {
@@ -203,9 +230,9 @@
         }
 
         .bubble {
-            max-width: 80%;
-            padding: 12px 20px;
-            border-radius: 28px;
+            max-width: 85%;
+            padding: 12px 18px;
+            border-radius: 26px;
             font-size: 0.95rem;
             line-height: 1.45;
             word-break: break-word;
@@ -238,12 +265,12 @@
         .copy-btn {
             position: absolute;
             bottom: 5px;
-            left: 10px;
+            left: 12px;
             background: var(--border-light);
             border: none;
             border-radius: 20px;
             padding: 4px 10px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             cursor: pointer;
             opacity: 0;
             transition: opacity 0.2s;
@@ -255,22 +282,22 @@
         }
 
         .input-area {
-            padding: 16px 20px;
+            padding: 12px 16px;
             background: var(--surface);
             border-top: 1px solid var(--border-light);
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
         }
 
         .input-area input {
             flex: 1;
-            padding: 14px 20px;
-            border-radius: 60px;
+            padding: 12px 18px;
+            border-radius: 50px;
             border: 1px solid var(--border-light);
             background: var(--bg-body);
             color: var(--text-primary);
-            font-size: 1rem;
+            font-size: 0.95rem;
             outline: none;
         }
 
@@ -282,13 +309,16 @@
         .send-btn {
             background: var(--accent);
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 46px;
+            height: 46px;
             border-radius: 30px;
             color: white;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             cursor: pointer;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .send-btn:disabled {
@@ -297,7 +327,7 @@
         }
 
         .info-panel {
-            padding: 24px;
+            padding: 20px;
             overflow-y: auto;
         }
 
@@ -329,7 +359,7 @@
                 background: var(--card-bg);
                 width: 260px;
                 border-radius: 20px 0 0 20px;
-                box-shadow: -5px 0 20px rgba(0,0,0,0.2);
+                box-shadow: -5px 0 20px rgba(0,0,0,0.3);
             }
             .sidebar.open {
                 right: 0;
@@ -347,7 +377,7 @@
         }
 
         footer {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-align: center;
             padding: 8px;
             color: var(--text-secondary);
@@ -385,10 +415,11 @@
         .quick-buttons {
             display: flex;
             gap: 10px;
-            padding: 8px 20px;
+            padding: 10px 16px;
             overflow-x: auto;
             background: var(--surface);
             border-bottom: 1px solid var(--border-light);
+            scrollbar-width: thin;
         }
         
         .quick-chip {
@@ -410,10 +441,10 @@
         .api-warning {
             background: #fee2e2;
             color: #991b1b;
-            padding: 8px 12px;
+            padding: 6px 12px;
             border-radius: 12px;
-            font-size: 0.75rem;
-            margin: 8px 20px;
+            font-size: 0.7rem;
+            margin: 6px 16px;
             text-align: center;
         }
 
@@ -436,6 +467,20 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+        
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .product-tag {
+            background: var(--accent-glow);
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
     </style>
 </head>
 <body>
@@ -450,7 +495,7 @@
             <button class="icon-btn menu-toggle" id="menuToggleBtn">☰</button>
             <button class="icon-btn" id="themeToggleBtn">🌓 الوضع</button>
             <button class="icon-btn" id="clearChatBtn">🗑️ مسح</button>
-            <button class="icon-btn" id="saveChatBtn">💾 حفظ المحادثة</button>
+            <button class="icon-btn" id="saveChatBtn">💾 حفظ</button>
         </div>
     </div>
 
@@ -464,31 +509,44 @@
 
         <div class="content-panel">
             <div id="apiWarning" class="api-warning hidden">
-                ⚠️ لم يتم إدخال مفتاح API بعد. يرجى الذهاب إلى الإعدادات وإدخال مفتاح Groq API الخاص بك.
+                ⚠️ لم يتم إدخال مفتاح API بعد. يرجى الذهاب إلى الإعدادات.
             </div>
             <div class="quick-buttons" id="quickButtons">
                 <div class="quick-chip" data-question="مواعيد التوصيل؟">⏰ مواعيد التوصيل</div>
                 <div class="quick-chip" data-question="شحن الدلفري لبداوي">🚚 سعر التوصيل لبداوي</div>
+                <div class="quick-chip" data-question="من صنعك؟">🤖 من صنعك؟</div>
+                <div class="quick-chip" data-question="ماذا لديكم بضاعة؟">🛍️ البضاعة المتوفرة</div>
+                <div class="quick-chip" data-question="الأسعار؟">💰 استفسار عن الأسعار</div>
                 <div class="quick-chip" data-question="رابط تطبيق Markit">📱 رابط التطبيق</div>
-                <div class="quick-chip" data-question="رقم الواتساب">📞 واتساب</div>
-                <div class="quick-chip" data-question="أريد طلب اونلاين">🛍️ طلب اونلاين</div>
-                <div class="quick-chip" data-question="ساعات العمل">🕒 متى بتفتح المحل؟</div>
-                <div class="quick-chip" data-question="كيف حالك؟">😊 كيف حالك؟</div>
+                <div class="quick-chip" data-question="ساعات العمل">🕒 ساعات العمل</div>
             </div>
-            <div class="chat-window" id="chatWindow">
-                <!-- سيتم ملء المحادثة هنا -->
-            </div>
+            <div class="chat-window" id="chatWindow"></div>
 
             <div id="infoPanel" class="info-panel hidden">
                 <h2>🛒 سوبر ماركت المصري x Markit</h2>
                 <hr style="margin: 15px 0; border-color: var(--border-light);">
                 <p><strong>📍 الموقع:</strong> طرابلس، لبنان - الميناء - السنترال - جامع السلام</p>
-                <p><strong>🕒 ساعات عمل المتجر:</strong> يومياً من <strong>8 صباحاً</strong> حتى <strong>11 مساءً</strong></p>
+                <p><strong>🕒 ساعات العمل:</strong> يومياً من <strong>8 صباحاً</strong> حتى <strong>11 مساءً</strong></p>
                 <p><strong>🚚 مواعيد Markit (التوصيل):</strong> يومياً 9 صباحاً – 10 مساءً</p>
                 <p><strong>📱 تطبيق Markit:</strong> <a href="https://play.google.com/store/apps/details?id=com.markitworld.app" target="_blank" style="color:var(--accent); font-weight:bold;">🔥 حمّل التطبيق من هنا 🔥</a></p>
                 <p><strong>🚚 رسوم التوصيل:</strong><br>• المناطق القريبة (الميناء، التل، الزاهرية، القبة): 160,000 ل.ل<br>• المناطق البعيدة (بداوي، قلمون، المنية، ضهر العين، بحصاص): 180,000 ل.ل</p>
                 <p><strong>📞 واتساب الرسمي:</strong> <a href="https://wa.me/96170257354" target="_blank" style="color:var(--accent);">+96170257354</a></p>
-                <p><strong>💡 نصيحة:</strong> يمكنك الطلب بسهولة عبر <strong>تطبيق Markit</strong> أو التواصل عبر <strong>الواتساب</strong>. البوت هنا للإجابة على استفساراتك فقط.</p>
+                
+                <h3 style="margin-top: 20px;">🛍️ بضاعة سوبر ماركت المصري</h3>
+                <div class="product-grid">
+                    <span class="product-tag">🥛 ألبان وأجبان</span>
+                    <span class="product-tag">🥫 معلبات (تونة، فول، معكرونة)</span>
+                    <span class="product-tag">❄️ مواد مجمدة (دجاج، لحوم، خضار)</span>
+                    <span class="product-tag">🍚 حبوب وأرز وعدس</span>
+                    <span class="product-tag">🍎 فواكه طازجة</span>
+                    <span class="product-tag">🥬 خضروات طازجة</span>
+                    <span class="product-tag">🧴 مواد تنظيف</span>
+                    <span class="product-tag">🍳 مواد أساسية للمطبخ (زيت، بهارات، صلصات)</span>
+                    <span class="product-tag">🥚 بيض</span>
+                    <span class="product-tag">🍞 مخبوزات</span>
+                    <span class="product-tag">🥤 مشروبات وعصائر</span>
+                </div>
+                <p style="margin-top: 16px;">✨ جميع المنتجات طازجة وذات جودة عالية. نقدم أفضل خدمة توصيل عبر Markit.</p>
             </div>
 
             <div id="settingsPanel" class="info-panel hidden">
@@ -496,88 +554,69 @@
                 <hr style="margin: 15px 0; border-color: var(--border-light);">
                 <p style="margin-bottom: 15px;">🔐 <strong>تم إعداد مفتاح API مسبقاً!</strong> 🎉</p>
                 <p style="margin-bottom: 15px; background: var(--accent-glow); padding: 12px; border-radius: 16px;">
-                    ✅ <strong>Groq API</strong> يعمل بكفاءة عالية - أسرع 20 مرة من Gemini العادي!
+                    ✅ <strong>Groq API</strong> يعمل بكفاءة عالية - أسرع 20 مرة!
                 </p>
                 <label style="display: block; margin-bottom: 10px; font-weight: 600;">📝 مفتاح Groq API:</label>
-                <input type="password" id="apiKeyInput" placeholder="أدخل مفتاح API هنا" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-light); background: var(--bg-body); color: var(--text-primary); margin-bottom: 15px; direction: ltr;" value="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">
+                <input type="password" id="apiKeyInput" placeholder="أدخل مفتاح API" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-light); background: var(--bg-body); color: var(--text-primary); margin-bottom: 15px; direction: ltr;">
                 <button id="saveApiKeyBtn" style="background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 600;">💾 حفظ المفتاح</button>
                 <button id="testApiBtn" style="background: var(--border-light); color: var(--text-primary); border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-right: 10px;">🔌 اختبار الاتصال</button>
                 <div id="apiStatus" style="margin-top: 15px; padding: 10px; border-radius: 12px; font-size: 0.9rem;"></div>
             </div>
 
             <div class="input-area">
-                <input type="text" id="messageInput" placeholder="اسأل: بدي اعرف شحن الدلفري، ساعات العمل، أو قلي كيف حالك..." autocomplete="off">
+                <input type="text" id="messageInput" placeholder="اسأل: بدي اعرف شحن الدلفري، أو من صنعك؟ أو شو عندكم بضاعة؟..." autocomplete="off">
                 <button class="send-btn" id="sendBtn">➤</button>
             </div>
-            <footer>⚡ Cerebonix AI Pro | Groq LLAMA 3.3 70B | أسرع ردود في العالم | 🔒 مفتاح API مخزّن محلياً</footer>
+            <footer>⚡ Cerebonix AI Pro | Groq LLAMA 3.3 70B | صنع بواسطة محمد حلاق 🇱🇧</footer>
         </div>
     </div>
 </div>
 
 <script>
-    // ===================== المفتاح الافتراضي (تم وضعه مسبقاً) =====================
     let apiKey = localStorage.getItem('groq_api_key') || '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';
     
-    // ===================== SYSTEM PROMPT المحسن =====================
-    const SYSTEM_PROMPT = `أنت "Cerebonix AI" – مساعد ودود، ذكي، وسريع لـ "سوبر ماركت المصري" وخدمة التوصيل "Markit".
+    // SYSTEM PROMPT محدث يحتوي على معلومات من صنعك، البضاعة، الأسعار مؤجلة
+    const SYSTEM_PROMPT = `أنت "Cerebonix AI" – مساعد ذكي لـ "سوبر ماركت المصري" وخدمة التوصيل "Markit". ردودك طبيعية 100% مثل إنسان لطيف.
 
-🚀 معلومات المتجر (دقيقة 100%):
-- اسم المتجر: سوبر ماركت نبيل المصري
-- الموقع: طرابلس، لبنان - الميناء - السنترال -بجانب جامع السلام
-- 🕒 ساعات العمل: يومياً من 8 صباحاً حتى 11 مساءً (جميع الأيام)
-- خدمة التوصيل Markit: من 9 صباحاً حتى 10 مساءً
+🎯 معلومات أساسية:
+- اسم صانعك: "محمد حلاق" (مبرمج التطبيق والمساعد الذكي). إذا سألك أحد "من صنعك؟" أو "مين عملك؟" قل: "أنا من صنع المبرمج القدير محمد حلاق، وهو الذي طورني لأخدم زبائن سوبر ماركت المصري بأفضل صورة 🙏💪".
+- اسم المتجر: سوبر ماركت المصري - الموقع: طرابلس، الميناء، السنترال - جامع السلام.
 
-💰 رسوم التوصيل:
-- المناطق القريبة (الميناء،نقابة اطباء): 160,000 ليرة لبنانية
-- المناطق البعيدة (ضم وفرز,الزاهرية,القبة, بداوي، قلمون، المنية، ضهر العين، بحصاص): 180,000 ليرة لبنانية
+🛍️ البضاعة المتوفرة (مهم جداً):
+لدينا: ألبان وأجبان، معلبات (تونة، فول، معكرونة)، مواد مجمدة (دجاج، لحوم، خضار)، حبوب وأرز وعدس، فواكه طازجة، خضروات طازجة، مواد تنظيف، مواد أساسية للمطبخ (زيت، بهارات، صلصات، سكر، طحين)، بيض، مخبوزات، مشروبات وعصائر، ومفرزات حبوب. كل شي تحتاجه للمنزل متوفر لدينا.
 
-📞 التواصل:
-- واتساب: +96170257354 (رابط مباشر: https://wa.me/96170257354)
+💰 الأسعار:
+إذا سألك أحد عن الأسعار، قل: "قريباً سندخل البضاعة مع الأسعار بشكل دقيق في النظام، حاليياً الأسعار محدثة داخل التطبيق أو يمكنك الاستفسار عبر الواتساب +96170257354. قريباً ستجد كل منتج بسعره هنا! 😊".
 
-📱 تطبيق Markit:
-- رابط التحميل: https://play.google.com/store/apps/details?id=com.markitworld.app
+🚚 مواعيد التوصيل ورسومه:
+- المناطق القريبة (الميناء، التل، الزاهرية، القبة): 160,000 ليرة.
+- المناطق البعيدة (بداوي، قلمون، المنية، ضهر العين، بحصاص): 180,000 ليرة.
+- خدمة Markit من 9 صباحاً حتى 10 مساءً.
+- ساعات المتجر: 8 صباحاً - 11 مساءً يومياً.
 
-🧠 أسلوب ردودك (مهم جداً):
-- أنت إنسان طبيعي 100%، لست روبوتاً.
-- إذا قال المستخدم "مرحباً" → رد "أهلاً بك يا صديقي! كيف أقدر أخدمك اليوم؟ 😊"
-- إذا قال "كيف حالك؟" → رد "أنا بخير الحمدلله، شكراً لسؤالك! كيف حالك أنت؟"
-- إذا قال "شكراً" → رد "العفو يا حبيبي، بأي خدمة ثانية؟"
-- تذكر تاريخ المحادثة بالكامل ولا تكرر نفس الإجابة.
-- استخدم إيموجيات خفيفة ولطيفة.
-- إذا سأل عن ساعات العمل مرتين → تذكر أنك أجبت قبل قليل وقل "زي ما قلتلك قبل شوي، من 8 الصبح لحد 11 المساء 😊"
-- كن سريعاً، واضحاً، ومفيداً.
+📞 واتساب: +96170257354
+📱 تطبيق Markit: https://play.google.com/store/apps/details?id=com.markitworld.app
 
-⚠️ ملاحظة: الطلب المباشر يتم عبر التطبيق أو واتساب فقط.`;
+أسلوبك: دافئ، تستخدم الإيموجيات الخفيفة، تتذكر المحادثة، لا تكرر نفس الإجابة، وكن سريعاً ومفيداً. إذا سأل عن حالك رحّب واسأله بالمثل.`;
 
-    // ===================== المتغيرات العامة =====================
     let conversationHistory = [];
     let isWaitingForResponse = false;
 
-    // ===================== دوال مساعدة =====================
     function autoLinkify(text) {
         let newText = text;
-        
-        // رابط تطبيق Markit
         if (newText.includes("markitworld.app") && !newText.includes("<a")) {
             newText = newText.replace(/(https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.markitworld\.app)/g, 
                 `<a href="$1" target="_blank" style="color:#f59e0b; font-weight:bold;">📲 اضغط لتحميل تطبيق Markit</a>`);
         }
-        
-        // رقم واتساب
         if (newText.includes("+96170257354") && !newText.includes("<a")) {
             newText = newText.replace(/(\+96170257354)/g, 
                 `<a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b; font-weight:bold;">$1 (واتساب)</a>`);
         }
-        
-        // تحويل أي رابط تلقائياً
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         newText = newText.replace(urlRegex, (url) => {
-            if (!url.includes('<a')) {
-                return `<a href="${url}" target="_blank" style="color:#f59e0b;">${url}</a>`;
-            }
+            if (!url.includes('<a')) return `<a href="${url}" target="_blank" style="color:#f59e0b;">${url}</a>`;
             return url;
         });
-        
         return newText;
     }
 
@@ -587,90 +626,47 @@
         copyBtn.innerHTML = '📋 نسخ';
         copyBtn.onclick = () => {
             navigator.clipboard.writeText(textToCopy);
-            copyBtn.innerHTML = '✅ تم النسخ';
-            setTimeout(() => {
-                copyBtn.innerHTML = '📋 نسخ';
-            }, 2000);
+            copyBtn.innerHTML = '✅ تم';
+            setTimeout(() => copyBtn.innerHTML = '📋 نسخ', 2000);
         };
         bubbleElement.appendChild(copyBtn);
     }
 
-    // ===================== استدعاء Groq API (الأسرع في العالم) =====================
     async function callGroq(userMessage) {
-        if (!apiKey) {
-            throw new Error('API_KEY_NOT_SET');
-        }
-
-        // بناء المحادثة بتنسيق OpenAI
+        if (!apiKey) throw new Error('API_KEY_NOT_SET');
         const messagesForAPI = [
             { role: "system", content: SYSTEM_PROMPT },
-            ...conversationHistory.slice(-25).map(msg => ({
-                role: msg.role === "user" ? "user" : "assistant",
-                content: msg.content
-            })),
+            ...conversationHistory.slice(-20).map(msg => ({ role: msg.role === "user" ? "user" : "assistant", content: msg.content })),
             { role: "user", content: userMessage }
         ];
-        
-        // استخدام Groq API (أسرع 20 مرة!)
         const url = "https://api.groq.com/openai/v1/chat/completions";
-        
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 15000);
-            
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile", // أسرع نموذج من Groq
-                    messages: messagesForAPI,
-                    temperature: 0.85,
-                    max_tokens: 800,
-                    top_p: 0.92
-                }),
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: messagesForAPI, temperature: 0.85, max_tokens: 800 }),
                 signal: controller.signal
             });
-            
             clearTimeout(timeoutId);
-            
             if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Groq API Error:", errorData);
-                if (response.status === 401) {
-                    throw new Error('API_KEY_INVALID');
-                }
-                throw new Error(`API_ERROR_${response.status}`);
+                const errData = await response.json();
+                if (response.status === 401) throw new Error('API_KEY_INVALID');
+                throw new Error(`API_ERROR`);
             }
-            
             const data = await response.json();
-            
             if (data.choices && data.choices[0]?.message?.content) {
-                let reply = data.choices[0].message.content;
-                reply = autoLinkify(reply);
-                return reply;
-            } else {
-                console.error("Unexpected Groq response:", data);
-                return "🙏 عذراً، حدث خطأ في الخادم. يرجى المحاولة مرة أخرى بعد ثانية. أو تواصل معنا مباشرة على واتساب: https://wa.me/96170257354";
+                return autoLinkify(data.choices[0].message.content);
             }
+            return "عذراً، حدث خطأ. تواصل عبر واتساب.";
         } catch (err) {
-            if (err.name === 'AbortError') {
-                return "⏰ استغرق الرد وقتاً طويلاً. يرجى المحاولة مرة أخرى.";
-            }
-            if (err.message === 'API_KEY_INVALID') {
-                return "🔑 مفتاح API غير صالح أو منتهي الصلاحية. يرجى الذهاب إلى الإعدادات وإدخال مفتاح صحيح.";
-            }
-            if (err.message === 'API_KEY_NOT_SET') {
-                return "🔐 لم يتم إعداد مفتاح API بعد. يرجى الذهاب إلى الإعدادات (⚙️) وإدخال مفتاح Groq API الخاص بك.";
-            }
-            console.error("Network Error:", err);
-            return "⚠️ خطأ في الاتصال. تأكد من اتصالك بالإنترنت، أو تواصل معنا على واتساب: https://wa.me/96170257354";
+            if (err.message === 'API_KEY_NOT_SET') return "🔐 لم يتم إعداد مفتاح API بعد.";
+            if (err.message === 'API_KEY_INVALID') return "🔑 مفتاح API غير صالح.";
+            return "⚠️ خطأ في الاتصال. تواصل على واتساب.";
         }
     }
-    
-    // ===================== دوال الواجهة =====================
+
     const chatWindow = document.getElementById('chatWindow');
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
@@ -681,15 +677,9 @@
     const overlay = document.getElementById('overlay');
     const menuToggle = document.getElementById('menuToggleBtn');
     const apiWarning = document.getElementById('apiWarning');
-    
-    function updateApiWarning() {
-        if (!apiKey) {
-            apiWarning.classList.remove('hidden');
-        } else {
-            apiWarning.classList.add('hidden');
-        }
-    }
-    
+
+    function updateApiWarning() { if (!apiKey) apiWarning.classList.remove('hidden'); else apiWarning.classList.add('hidden'); }
+
     function addMessageToUI(text, role) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${role === 'user' ? 'user-message' : 'bot-message'}`;
@@ -697,28 +687,17 @@
         bubble.className = 'bubble';
         bubble.innerHTML = text.replace(/\n/g, '<br>');
         msgDiv.appendChild(bubble);
-        
         if (role === 'assistant') {
             const plainText = text.replace(/<[^>]*>/g, '');
             addCopyButton(bubble, plainText);
         }
-        
         chatWindow.appendChild(msgDiv);
         chatWindow.scrollTop = chatWindow.scrollHeight;
-        
-        if (role !== 'system') {
-            conversationHistory.push({ role: role, content: text.replace(/<[^>]*>/g, '') });
-        }
-        
-        // الحفاظ على حجم التاريخ معقولاً
-        if (conversationHistory.length > 50) {
-            conversationHistory = conversationHistory.slice(-50);
-        }
-        
-        // حفظ المحادثة تلقائياً
+        if (role !== 'system') conversationHistory.push({ role: role, content: text.replace(/<[^>]*>/g, '') });
+        if (conversationHistory.length > 60) conversationHistory = conversationHistory.slice(-60);
         localStorage.setItem('chat_history', JSON.stringify(conversationHistory));
     }
-    
+
     function showTyping() {
         const typingDiv = document.createElement('div');
         typingDiv.className = 'message bot-message';
@@ -727,230 +706,104 @@
         chatWindow.appendChild(typingDiv);
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
-    
-    function removeTyping() {
-        const el = document.getElementById('typing-indicator');
-        if(el) el.remove();
-    }
-    
+    function removeTyping() { const el = document.getElementById('typing-indicator'); if(el) el.remove(); }
+
     async function sendUserMessage(text = null) {
         if (isWaitingForResponse) return;
-        
         let message = text || messageInput.value.trim();
         if (!message) return;
-        
         if (!text) messageInput.value = '';
-        
         addMessageToUI(message, 'user');
         isWaitingForResponse = true;
         sendBtn.disabled = true;
         showTyping();
-        
         try {
             const reply = await callGroq(message);
             removeTyping();
             addMessageToUI(reply, 'assistant');
         } catch (err) {
             removeTyping();
-            addMessageToUI("🙏 عذراً، حدث خطأ. يرجى المحاولة مرة أخرى، أو تواصل معنا على واتساب: https://wa.me/96170257354", 'assistant');
+            addMessageToUI("🙏 عذراً، حدث خطأ. تواصل عبر واتساب.", 'assistant');
         } finally {
             isWaitingForResponse = false;
             sendBtn.disabled = false;
             messageInput.focus();
         }
     }
-    
+
     function loadWelcomeMessage() {
-        const welcomeHTML = `<div class="message bot-message">
-            <div class="bubble">
-                🚀✨ أهلاً بك في <strong>Cerebonix AI Pro</strong> – أذكى مساعد لـ <strong>سوبر ماركت المصري</strong> وخدمة <strong>Markit</strong>!<br><br>
-                ⚡ <strong>يعمل الآن على Groq AI - أسرع 20 مرة!</strong><br><br>
-                🕒 ساعات العمل: <strong>8 صباحاً - 11 مساءً</strong> يومياً<br>
-                📞 <a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b; font-weight:bold;">واتساب الدعم +96170257354</a><br>
-                📱 <a href="https://play.google.com/store/apps/details?id=com.markitworld.app" target="_blank" style="color:#f59e0b; font-weight:bold;">تحميل تطبيق Markit</a><br><br>
-                اسألني أي شيء، وأنا هنا لمساعدتك 😊💪
-            </div>
-        </div>`;
-        chatWindow.innerHTML = welcomeHTML;
+        chatWindow.innerHTML = `<div class="message bot-message"><div class="bubble">🚀✨ أهلاً بك في <strong>Cerebonix AI Pro</strong> – أذكى مساعد لـ <strong>سوبر ماركت المصري</strong> وخدمة <strong>Markit</strong>!<br><br>⚡ <strong>Groq AI - أسرع 20 مرة</strong><br>📦 عندنا: ألبان، لحوم، خضار، فواكه، معلبات، مواد تنظيف، وكل احتياجاتك 🛍️<br>💰 الأسعار: قريباً سندخل البضاعة مع الأسعار بالكامل!<br>📞 <a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b;">واتساب +96170257354</a><br>اسألني عن أي شي، أنا صنع <strong>محمد حلاق</strong> 🙌</div></div>`;
     }
-    
-    function clearChat() {
-        if (confirm('⚠️ هل أنت متأكد من مسح المحادثة؟')) {
-            conversationHistory = [];
-            loadWelcomeMessage();
-            localStorage.removeItem('chat_history');
-        }
-    }
-    
+
+    function clearChat() { if(confirm('مسح المحادثة؟')) { conversationHistory = []; loadWelcomeMessage(); localStorage.removeItem('chat_history'); } }
     function saveChat() {
-        if (conversationHistory.length === 0) {
-            alert('لا توجد محادثة لحفظها.');
-            return;
-        }
-        
-        const chatText = conversationHistory.map(msg => 
-            `${msg.role === 'user' ? '👤 مستخدم' : '🤖 Cerebonix'}: ${msg.content}`
-        ).join('\n\n');
-        
-        const blob = new Blob([chatText], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
+        if(conversationHistory.length===0) return alert('لا توجد محادثة');
+        const text = conversationHistory.map(m=>`${m.role==='user'?'👤':'🤖'}: ${m.content}`).join('\n\n');
+        const blob = new Blob([text], {type:'text/plain'});
         const a = document.createElement('a');
-        a.href = url;
-        a.download = `cerebonix_chat_${new Date().toISOString().slice(0,19)}.txt`;
+        a.href = URL.createObjectURL(blob);
+        a.download = `cerebonix_${Date.now()}.txt`;
         a.click();
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(a.href);
     }
-    
     function loadSavedChat() {
         const saved = localStorage.getItem('chat_history');
-        if (saved) {
-            try {
-                const savedHistory = JSON.parse(saved);
-                if (Array.isArray(savedHistory) && savedHistory.length > 0) {
-                    conversationHistory = savedHistory;
-                    chatWindow.innerHTML = '';
-                    conversationHistory.forEach(msg => {
-                        addMessageToUI(msg.content, msg.role);
-                    });
-                    return;
-                }
-            } catch(e) {}
-        }
-        loadWelcomeMessage();
+        if(saved && JSON.parse(saved).length) {
+            conversationHistory = JSON.parse(saved);
+            chatWindow.innerHTML = '';
+            conversationHistory.forEach(msg => addMessageToUI(msg.content, msg.role));
+        } else loadWelcomeMessage();
     }
-    
     function switchTab(tabId) {
-        const chatWin = document.getElementById('chatWindow');
-        const infoPan = document.getElementById('infoPanel');
-        const settingsPan = document.getElementById('settingsPanel');
-        
-        chatWin.classList.add('hidden');
-        infoPan.classList.add('hidden');
-        settingsPan.classList.add('hidden');
-        
-        if (tabId === 'info') {
-            infoPan.classList.remove('hidden');
-        } else if (tabId === 'settings') {
-            settingsPan.classList.remove('hidden');
-        } else {
-            chatWin.classList.remove('hidden');
-        }
-        
-        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-        const activeTab = Array.from(document.querySelectorAll('.menu-item')).find(el => el.dataset.tab === tabId);
-        if(activeTab) activeTab.classList.add('active');
-        
-        if(window.innerWidth <= 780) {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('open');
-        }
+        document.getElementById('chatWindow').classList.add('hidden');
+        document.getElementById('infoPanel').classList.add('hidden');
+        document.getElementById('settingsPanel').classList.add('hidden');
+        if(tabId==='info') document.getElementById('infoPanel').classList.remove('hidden');
+        else if(tabId==='settings') document.getElementById('settingsPanel').classList.remove('hidden');
+        else document.getElementById('chatWindow').classList.remove('hidden');
+        document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
+        const active = Array.from(document.querySelectorAll('.menu-item')).find(el=>el.dataset.tab===tabId);
+        if(active) active.classList.add('active');
+        if(window.innerWidth<=780) { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
     }
-    
-    function toggleTheme() {
-        document.body.classList.toggle('dark');
-        localStorage.setItem('cerebonix_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-    }
-    
-    // ===================== إعدادات API =====================
+    function toggleTheme() { document.body.classList.toggle('dark'); localStorage.setItem('cerebonix_theme', document.body.classList.contains('dark')?'dark':'light'); }
+
     function setupApiSettings() {
         const apiKeyInput = document.getElementById('apiKeyInput');
         const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
         const testApiBtn = document.getElementById('testApiBtn');
         const apiStatus = document.getElementById('apiStatus');
-        
-        // إظهار أن المفتاح موجود مسبقاً
-        if (apiKey && apiKey !== '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') {
-            apiKeyInput.value = '••••••••••••••••••••••••';
-        } else if (apiKey === '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') {
-            apiKeyInput.value = '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';
-        }
-        
+        if(apiKey) apiKeyInput.value = '••••••••••••••••••••••';
         saveApiKeyBtn.onclick = () => {
-            const newKey = prompt('الرجاء إدخال مفتاح Groq API الخاص بك:', apiKey || '');
-            if (newKey && newKey.trim()) {
-                apiKey = newKey.trim();
-                localStorage.setItem('groq_api_key', apiKey);
-                apiKeyInput.value = '••••••••••••••••••••••••';
-                apiStatus.innerHTML = '<span style="color: #22c55e;">✅ تم حفظ المفتاح بنجاح! Groq AI جاهز للعمل.</span>';
-                updateApiWarning();
-                setTimeout(() => {
-                    apiStatus.innerHTML = '';
-                }, 3000);
-            }
+            const newKey = prompt('أدخل مفتاح Groq API:', apiKey || '');
+            if(newKey && newKey.trim()) { apiKey = newKey.trim(); localStorage.setItem('groq_api_key', apiKey); apiKeyInput.value = '••••••••••••••'; apiStatus.innerHTML = '<span style="color:#22c55e;">✅ تم حفظ المفتاح</span>'; updateApiWarning(); setTimeout(()=>apiStatus.innerHTML='',2500); }
         };
-        
         testApiBtn.onclick = async () => {
-            if (!apiKey) {
-                apiStatus.innerHTML = '<span style="color: #ef4444;">❌ لم يتم إدخال مفتاح API بعد.</span>';
-                return;
-            }
-            
-            apiStatus.innerHTML = '<span style="color: #f59e0b;">⏳ جاري اختبار الاتصال بـ Groq...</span>';
-            
+            if(!apiKey) { apiStatus.innerHTML='<span style="color:#ef4444;">❌ لا يوجد مفتاح</span>'; return; }
+            apiStatus.innerHTML='<span style="color:#f59e0b;">⏳ جاري الاختبار...</span>';
             try {
-                const testMessages = [
-                    { role: "system", content: "رد بكلمة 'مرحباً' فقط" },
-                    { role: "user", content: "قل مرحباً" }
-                ];
-                const url = "https://api.groq.com/openai/v1/chat/completions";
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
-                        messages: testMessages,
-                        max_tokens: 10
-                    })
-                });
-                
-                if (response.ok) {
-                    apiStatus.innerHTML = '<span style="color: #22c55e;">✅ الاتصال ناجح! Groq AI يعمل بسرعة فائقة 🚀</span>';
-                } else {
-                    apiStatus.innerHTML = '<span style="color: #ef4444;">❌ فشل الاتصال. يرجى التحقق من مفتاح Groq API.</span>';
-                }
-            } catch(err) {
-                apiStatus.innerHTML = '<span style="color: #ef4444;">❌ خطأ في الاتصال. تأكد من اتصالك بالإنترنت.</span>';
-            }
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`}, body:JSON.stringify({model:'llama-3.3-70b-versatile', messages:[{role:'user',content:'Hi'}], max_tokens:5}) });
+                if(res.ok) apiStatus.innerHTML='<span style="color:#22c55e;">✅ Groq يعمل بسرعة!</span>';
+                else apiStatus.innerHTML='<span style="color:#ef4444;">❌ فشل الاتصال</span>';
+            } catch(e) { apiStatus.innerHTML='<span style="color:#ef4444;">❌ خطأ</span>'; }
         };
     }
-    
-    // ===================== الأحداث =====================
-    document.querySelectorAll('.menu-item').forEach(item => {
-        item.addEventListener('click', (e) => switchTab(item.dataset.tab));
-    });
-    
-    sendBtn.addEventListener('click', () => sendUserMessage());
-    messageInput.addEventListener('keypress', (e) => { if(e.key === 'Enter' && !isWaitingForResponse) sendUserMessage(); });
-    themeToggle.addEventListener('click', toggleTheme);
-    clearChatBtn.addEventListener('click', clearChat);
-    saveChatBtn.addEventListener('click', saveChat);
-    
-    menuToggle?.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('open');
-    });
-    
-    overlay?.addEventListener('click', () => {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('open');
-    });
-    
-    document.querySelectorAll('.quick-chip').forEach(chip => {
-        chip.addEventListener('click', () => sendUserMessage(chip.dataset.question));
-    });
-    
-    // استعادة الوضع الليلي والمحادثة
+
+    document.querySelectorAll('.menu-item').forEach(i=>i.addEventListener('click',()=>switchTab(i.dataset.tab)));
+    sendBtn.addEventListener('click',()=>sendUserMessage());
+    messageInput.addEventListener('keypress',(e)=> { if(e.key==='Enter' && !isWaitingForResponse) sendUserMessage(); });
+    themeToggle.addEventListener('click',toggleTheme);
+    clearChatBtn.addEventListener('click',clearChat);
+    saveChatBtn.addEventListener('click',saveChat);
+    menuToggle?.addEventListener('click',()=>{ sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
+    overlay?.addEventListener('click',()=>{ sidebar.classList.remove('open'); overlay.classList.remove('open'); });
+    document.querySelectorAll('.quick-chip').forEach(chip=>chip.addEventListener('click',()=>sendUserMessage(chip.dataset.question)));
+
     const savedTheme = localStorage.getItem('cerebonix_theme');
-    if(savedTheme === 'dark') document.body.classList.add('dark');
-    
+    if(savedTheme==='dark') document.body.classList.add('dark');
     loadSavedChat();
     setupApiSettings();
     updateApiWarning();
-    
-    console.log("✅ Cerebonix AI Pro مع Groq API جاهز! أسرع 20x من Gemini 🚀");
 </script>
 </body>
 </html>
