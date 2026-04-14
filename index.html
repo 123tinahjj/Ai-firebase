@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -258,7 +259,7 @@
             opacity: 0.8;
         }
 
-        .copy-btn {
+        .copy-btn, .listen-btn {
             position: absolute;
             bottom: 5px;
             left: 12px;
@@ -271,11 +272,10 @@
             opacity: 0;
             transition: opacity 0.2s;
             color: var(--text-primary);
+            margin-left: 5px;
         }
-
-        .bot-message:hover .copy-btn {
-            opacity: 1;
-        }
+        .listen-btn { left: 70px; }
+        .bot-message:hover .copy-btn, .bot-message:hover .listen-btn { opacity: 1; }
 
         .input-area {
             padding: 12px 16px;
@@ -302,7 +302,7 @@
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
-        .send-btn {
+        .send-btn, .voice-btn {
             background: var(--accent);
             border: none;
             width: 46px;
@@ -316,8 +316,9 @@
             align-items: center;
             justify-content: center;
         }
+        .voice-btn { background: #3b82f6; }
 
-        .send-btn:disabled {
+        .send-btn:disabled, .voice-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
@@ -478,6 +479,13 @@
             font-weight: 600;
             cursor: pointer;
         }
+        .map-link {
+            background: var(--accent-glow);
+            padding: 8px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -518,6 +526,7 @@
                 <div class="quick-chip" data-question="الأسعار؟">💰 استفسار عن الأسعار</div>
                 <div class="quick-chip" data-question="رابط تطبيق Markit">📱 رابط التطبيق</div>
                 <div class="quick-chip" data-question="ساعات العمل">🕒 ساعات العمل</div>
+                <div class="quick-chip" data-question="عنوان السوبر ماركت بالخريطة">📍 عنوان المتجر على الخريطة</div>
             </div>
             <div class="chat-window" id="chatWindow"></div>
 
@@ -525,25 +534,14 @@
                 <h2>🛒 سوبر ماركت نبيل المصري x Markit</h2>
                 <hr style="margin: 15px 0; border-color: var(--border-light);">
                 <p><strong>📍 الموقع:</strong> طرابلس، لبنان - الميناء - السنترال - جامع السلام</p>
+                <div class="map-link"><a href="https://www.google.com/maps?q=34.4500,35.8333" target="_blank" style="color:var(--accent);">🗺️ افتح الموقع على خرائط جوجل (تقريبي الميناء)</a></div>
                 <p><strong>🕒 ساعات العمل:</strong> يومياً من <strong>8 صباحاً</strong> حتى <strong>11 مساءً</strong></p>
                 <p><strong>🚚 مواعيد Markit (التوصيل):</strong> يومياً 9 صباحاً – 10 مساءً</p>
                 <p><strong>📱 تطبيق Markit:</strong> <a href="https://play.google.com/store/apps/details?id=com.markitworld.app" target="_blank" style="color:var(--accent); font-weight:bold;">🔥 حمّل التطبيق من هنا 🔥</a></p>
-                <p><strong>🚚 رسوم التوصيل:</strong><br>• المناطق القريبة (الميناء): 160,000 ل.ل<br>• المناطق البعيدة (، التل، الزاهرية، القبة، بداوي، قلمون، المنية، ضهر العين، بحصاص): 180,000 ل.ل</p>
+                <p><strong>🚚 رسوم التوصيل:</strong><br>• المناطق القريبة (الميناء): 160,000 ل.ل<br>• المناطق البعيدة (التل، الزاهرية، القبة، بداوي، قلمون، المنية، ضهر العين، بحصاص): 180,000 ل.ل</p>
                 <p><strong>📞 واتساب الرسمي:</strong> <a href="https://wa.me/96170257354" target="_blank" style="color:var(--accent);">+96170257354</a></p>
                 <h3 style="margin-top: 20px;">🛍️ بضاعة سوبر ماركت نبيل المصري</h3>
-                <div class="product-grid">
-                    <span class="product-tag">🥛 ألبان وأجبان</span>
-                    <span class="product-tag">🥫 معلبات (تونة، فول، معكرونة)</span>
-                    <span class="product-tag">❄️ مواد مجمدة (دجاج، لحوم، خضار)</span>
-                    <span class="product-tag">🍚 حبوب وأرز وعدس</span>
-                    <span class="product-tag">🍎 فواكه طازجة</span>
-                    <span class="product-tag">🥬 خضروات طازجة</span>
-                    <span class="product-tag">🧴 مواد تنظيف</span>
-                    <span class="product-tag">🍳 مواد أساسية للمطبخ (زيت، بهارات، صلصات)</span>
-                    <span class="product-tag">🥚 بيض</span>
-                    <span class="product-tag">🍞 مخبوزات</span>
-                    <span class="product-tag">🥤 مشروبات وعصائر</span>
-                </div>
+                <div class="product-grid"><span class="product-tag">🥛 ألبان وأجبان</span><span class="product-tag">🥫 معلبات</span><span class="product-tag">❄️ مواد مجمدة</span><span class="product-tag">🍚 حبوب وأرز</span><span class="product-tag">🍎 فواكه طازجة</span><span class="product-tag">🥬 خضروات طازجة</span><span class="product-tag">🧴 مواد تنظيف</span><span class="product-tag">🍳 مواد أساسية</span><span class="product-tag">🥚 بيض</span><span class="product-tag">🍞 مخبوزات</span><span class="product-tag">🥤 مشروبات</span></div>
             </div>
 
             <div id="settingsPanel" class="info-panel hidden">
@@ -559,9 +557,10 @@
 
             <div class="input-area">
                 <input type="text" id="messageInput" placeholder="اسأل: بدي اعرف شحن الدلفري، أو من صنعك؟ أو شو عندكم بضاعة؟..." autocomplete="off">
+                <button class="voice-btn" id="voiceBtn" title="تسجيل صوتي">🎤</button>
                 <button class="send-btn" id="sendBtn">➤</button>
             </div>
-            <footer>⚡ Cerebonix AI Pro | صنع بواسطة محمد حلاق 🇱🇧</footer>
+            <footer>⚡ Cerebonix AI Pro | صنع بواسطة محمد حلاق 🇱🇧 | دعم صوتي وخرائط</footer>
         </div>
     </div>
 </div>
@@ -570,72 +569,52 @@
     let apiKey = localStorage.getItem('groq_api_key') || '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';
     let currentUser = JSON.parse(localStorage.getItem('cerebonix_user')) || null;
     
-    // نظام برومبت احترافي يمنع خروج أي CSS أو أكواد
     const SYSTEM_PROMPT = `أنت "Cerebonix AI" – مساعد ذكي لـ "سوبر ماركت المصري" وخدمة "Markit". ردودك طبيعية، منسقة، ولا تظهر أي كود CSS أو HTML أو أخطاء برمجية. أنت ترد بجمل عربية سليمة فقط.
  🎯 معلومات أساسية:
 - صانعك: "محمد حلاق".
-- المتجر: سوبر ماركت نبيل المصري - الموقع: طرابلس، الميناء، السنترال - جامع السلام.
+- المتجر: سوبر ماركت نبيل المصري - الموقع: طرابلس، الميناء، السنترال - جامع السلام. عنوان الخريطة: https://maps.google.com/?q=34.4367,35.8343 (الميناء)
 
-🛍️ البضاعة المتوفرة:
-ألبان، أجبان، معلبات، مواد مجمدة، حبوب، أرز، عدس، فواكه، خضار، مواد تنظيف، زيت، بهارات، بيض، مخبوزات، مشروبات.
+🛍️ البضاعة المتوفرة: ألبان، أجبان، معلبات، مواد مجمدة، حبوب، أرز، عدس، فواكه، خضار، مواد تنظيف، زيت، بهارات، بيض، مخبوزات، مشروبات.
 
-💰 الأسعار:
-إذا سُئلت عن الأسعار، قل: "قريباً سندخل البضاعة مع الأسعار بشكل دقيق، حالياً يمكنك الاستفسار عبر واتساب +96170257354".
+💰 الأسعار: إذا سُئلت عن الأسعار، قل: "قريباً سندخل البضاعة مع الأسعار بشكل دقيق، حالياً يمكنك الاستفسار عبر واتساب +96170257354".
 
-🚚 **رسوم التوصيل (منسقة):**  
-المناطق القريبة (160,000 ليرة):  
-• الميناء  
-• نقابة أطباء  
+🚚 **رسوم التوصيل:** المناطق القريبة (160,000 ليرة): الميناء، نقابة أطباء. المناطق البعيدة (180,000 ليرة): بداوي، قلمون، المنية، ضهر العين، بحصاص، التل، الزاهرية، القبة.
+⏰ مواعيد التوصيل: يومياً 9 صباحاً – 10 مساءً. ساعات المتجر: 8 صباحاً – 11 مساءً.
 
-المناطق البعيدة (180,000 ليرة):  
-• بداوي  
-• قلمون  
-• المنية  
-• ضهر العين  
-• بحصاص  
-• التل  
-• الزاهرية  
-• القبة  
+📞 واتساب: +96170257354 📱 رابط التطبيق: https://play.google.com/store/apps/details?id=com.markitworld.app
 
-⏰ مواعيد التوصيل: يومياً 9 صباحاً – 10 مساءً.  
-🕒 ساعات المتجر: 8 صباحاً – 11 مساءً.
+✨ **مميزات Markit:** إذا كان المنتج غير متوفر، يتصل بك فريق Markit فوراً ويقترح بديلاً.
 
-📞 واتساب: +96170257354  
-📱 رابط التطبيق: https://play.google.com/store/apps/details?id=com.markitworld.app
+📱 **كيفية استخدام تطبيق Markit خطوة بخطوة:** حمّل التطبيق، أدخل رقم هاتفك، رمز التحقق عبر واتساب، فعّل GPS، أدخل عنوانك بالتفصيل.
 
-✨ **مميزات خدمة Markit:**  
-- إذا كان المنتج غير متوفر (Out of Stock)، يتصل بك فريق Markit فوراً ليخبرك، ويرسل لك صورة لمنتج بديل بنفس الجودة أو أفضل، وبموافقتك يتم استبداله.
-- كل منتج له بديل، نضمن لك وصول طلبك كاملاً.
+🆘 **إذا واجهت مشكلة في التطبيق:** يمكنني مساعدتك خطوة بخطوة.
 
-📱 **كيفية استخدام تطبيق Markit خطوة بخطوة:**  
-1. حمّل التطبيق من الرابط أعلاه.  
-2. افتح التطبيق وأدخل رقم هاتفك.  
-3. سيصلك رمز تحقق عبر واتساب، أدخله في التطبيق.  
-4. فعّل خاصية GPS ليحدد التطبيق أقرب فرع لك.  
-5. أدخل عنوان منزلك بالتفصيل: (المنزل، الطابق، رقم المبنى، الشارع، معلم قريب).  
-6. ابدأ بالتصفح واختيار منتجاتك.  
-7. كل ما تراه على التطبيق متوفر فعلياً في المتجر.
+أسلوبك: مهذب، دافئ، تستخدم إيموجيات بسيطة، ولا تكتب أي شيفرة برمجية. إذا سألك أحد عن المناطق والأسعار، أظهر القوائم بشكل نقطي.`;
 
-🆘 **إذا واجهت مشكلة في التطبيق:**  
-يمكنني مساعدتك خطوة بخطوة. وإذا لم يفتح معك التطبيق نهائياً، يمكنك التواصل مباشرة مع المتجر عبر واتساب على الرقم +96170257354 وسيتم خدمتك فوراً.
-
-💡 **نصائح إضافية:**     
-- أشهر المنتجات اليومية: الحليب الطازج، الخبز، البيض، الخضروات الموسمية.
-
-أسلوبك: مهذب، دافئ، تستخدم إيموجيات بسيطة، ولا تكتب أي شيفرة برمجية. إذا سألك أحد عن المناطق والأسعار، أظهر القوائم بشكل نقطي منسق كما هو موضح أعلاه.`;
     let conversationHistory = [];
     let isWaitingForResponse = false;
+    let speechSynthesisUtterance = null;
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    // Text-to-speech function
+    function speakText(text) {
+        if (window.speechSynthesis) {
+            if (speechSynthesisUtterance) window.speechSynthesis.cancel();
+            const cleanText = text.replace(/<[^>]*>/g, '');
+            speechSynthesisUtterance = new SpeechSynthesisUtterance(cleanText);
+            speechSynthesisUtterance.lang = 'ar-SA';
+            speechSynthesisUtterance.rate = 0.9;
+            window.speechSynthesis.speak(speechSynthesisUtterance);
+        }
+    }
 
     function autoLinkify(text) {
         let newText = text;
-        if (newText.includes("markitworld.app") && !newText.includes("<a")) {
-            newText = newText.replace(/(https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.markitworld\.app)/g, 
-                `<a href="$1" target="_blank" style="color:#f59e0b; font-weight:bold;">📲 اضغط لتحميل تطبيق Markit</a>`);
-        }
-        if (newText.includes("+96170257354") && !newText.includes("<a")) {
-            newText = newText.replace(/(\+96170257354)/g, 
-                `<a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b; font-weight:bold;">$1 (واتساب)</a>`);
-        }
+        newText = newText.replace(/(https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.markitworld\.app)/g, `<a href="$1" target="_blank" style="color:#f59e0b; font-weight:bold;">📲 اضغط لتحميل تطبيق Markit</a>`);
+        newText = newText.replace(/(\+96170257354)/g, `<a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b; font-weight:bold;">$1 (واتساب)</a>`);
+        newText = newText.replace(/عنوان المتجر\s*الخريطة/gi, '📍 عنوان المتجر على الخريطة: <a href="https://www.google.com/maps?q=34.4367,35.8343" target="_blank" style="color:#f59e0b;">🗺️ اضغط للموقع</a>');
         return newText;
     }
 
@@ -643,16 +622,7 @@
         let clean = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
         clean = clean.replace(/<script[\s\S]*?<\/script>/gi, '');
         clean = clean.replace(/`{3}[\s\S]*?`{3}/g, '');
-        clean = clean.replace(/```[\s\S]*?```/g, '');
-        clean = clean.replace(/(font-family|background|color):[^;]+;/gi, '');
         return clean;
-    }
-
-    function formatDeliveryResponseIfNeeded(text) {
-        if (text.includes("160,000") && text.includes("180,000") && !text.includes("•")) {
-            return "🚚 رسوم التوصيل:\n\nالمدن القريبة (160,000 ليرة):\n• الميناء\n\nالمدن البعيدة (180,000 ليرة):\n• بداوي\n• التل\n• الزاهرية\n• القبة\n•قلمون\n• المنية\n• ضهر العين\n• بحصاص";
-        }
-        return text;
     }
 
     async function callGroq(userMessage) {
@@ -681,7 +651,6 @@
             if (data.choices && data.choices[0]?.message?.content) {
                 let raw = data.choices[0].message.content;
                 raw = sanitizeBotReply(raw);
-                raw = formatDeliveryResponseIfNeeded(raw);
                 return autoLinkify(raw);
             }
             return "عذراً، حدث خطأ. تواصل عبر واتساب.";
@@ -690,6 +659,15 @@
             if (err.message === 'API_KEY_INVALID') return "🔑 مفتاح API غير صالح.";
             return "⚠️ خطأ في الاتصال. تواصل على واتساب.";
         }
+    }
+
+    // WhatsApp send formatted message
+    function sendToWhatsApp(userMessage) {
+        if (!currentUser) { alert("الرجاء تسجيل الدخول أولاً لإرسال الرسالة إلى واتساب المحل."); return; }
+        const formattedMsg = `🛍️ *رسالة من عميل Cerebonix*\n👤 الاسم: ${currentUser.name}\n📧 البريد: ${currentUser.email}\n💬 الرسالة: ${userMessage}\n📱 تم الإرسال من تطبيق سوبر ماركت المصري - Markit`;
+        const encoded = encodeURIComponent(formattedMsg);
+        window.open(`https://wa.me/96170257354?text=${encoded}`, '_blank');
+        addMessageToUI(`✅ تم توجيه رسالتك إلى واتساب المحل: "${userMessage.substring(0, 50)}..." سيتم الرد عليك قريباً.`, 'assistant');
     }
 
     const chatWindow = document.getElementById('chatWindow');
@@ -705,24 +683,13 @@
     const settingsMenuItem = document.getElementById('settingsMenuItem');
     const userGreetingSpan = document.getElementById('userGreetingSpan');
     const loginLogoutBtn = document.getElementById('loginLogoutBtn');
+    const voiceBtn = document.getElementById('voiceBtn');
 
     function updateApiWarning() { if (!apiKey) apiWarning.classList.remove('hidden'); else apiWarning.classList.add('hidden'); }
-    function updateSettingsVisibility() {
-        if (!currentUser) {
-            settingsMenuItem.classList.add('hidden');
-        } else {
-            settingsMenuItem.classList.remove('hidden');
-        }
-    }
+    function updateSettingsVisibility() { if (!currentUser) settingsMenuItem.classList.add('hidden'); else settingsMenuItem.classList.remove('hidden'); }
     function updateUserUI() {
-        if (currentUser) {
-            userGreetingSpan.classList.remove('hidden');
-            userGreetingSpan.innerHTML = `👋 أهلاً ${currentUser.name.split(' ')[0]}`;
-            loginLogoutBtn.textContent = '🚪 تسجيل خروج';
-        } else {
-            userGreetingSpan.classList.add('hidden');
-            loginLogoutBtn.textContent = '🔐 تسجيل دخول';
-        }
+        if (currentUser) { userGreetingSpan.classList.remove('hidden'); userGreetingSpan.innerHTML = `👋 أهلاً ${currentUser.name.split(' ')[0]}`; loginLogoutBtn.textContent = '🚪 تسجيل خروج'; }
+        else { userGreetingSpan.classList.add('hidden'); loginLogoutBtn.textContent = '🔐 تسجيل دخول'; }
         updateSettingsVisibility();
     }
 
@@ -740,6 +707,12 @@
             copyBtn.innerHTML = '📋 نسخ';
             copyBtn.onclick = () => { navigator.clipboard.writeText(plainText); copyBtn.innerHTML = '✅ تم'; setTimeout(() => copyBtn.innerHTML = '📋 نسخ', 2000); };
             bubble.appendChild(copyBtn);
+            
+            const listenBtn = document.createElement('button');
+            listenBtn.className = 'listen-btn';
+            listenBtn.innerHTML = '🔊 استماع';
+            listenBtn.onclick = () => speakText(plainText);
+            bubble.appendChild(listenBtn);
         }
         chatWindow.appendChild(msgDiv);
         chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -762,10 +735,23 @@
         if (isWaitingForResponse) return;
         let message = text || messageInput.value.trim();
         if (!message) return;
-        if (!text) messageInput.value = '';
+        if (!text) {
+            messageInput.value = '';
+            // إخفاء الكيبورد بعد الإرسال
+            messageInput.blur();
+        }
         addMessageToUI(message, 'user');
+        
+        // Check for specific "ارسلها عبر واتساب" request
+        if (message.includes("واتساب") && (message.includes("ارسل") || message.includes("أرسل"))) {
+            sendToWhatsApp(message);
+            isWaitingForResponse = false;
+            return;
+        }
+        
         isWaitingForResponse = true;
         sendBtn.disabled = true;
+        voiceBtn.disabled = true;
         showTyping();
         try {
             const reply = await callGroq(message);
@@ -773,16 +759,62 @@
             addMessageToUI(reply, 'assistant');
         } catch (err) {
             removeTyping();
-            addMessageToUI("🙏 عذراً، حدث خطأ. تواصل عبر واتساب.", 'assistant');
+            addMessageToUI("🙏 عذراً، حدث خطأ. لكن يمكنك مراسلتنا عبر واتساب +96170257354.", 'assistant');
         } finally {
             isWaitingForResponse = false;
             sendBtn.disabled = false;
-            messageInput.focus();
+            voiceBtn.disabled = false;
         }
     }
 
+    // Voice Recording
+    async function startRecording() {
+        if (isRecording) return;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const base64data = reader.result.split(',')[1];
+                    // استخدام Web Speech API للتعرف الصوتي
+                    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                    recognition.lang = 'ar-LB';
+                    recognition.interimResults = false;
+                    recognition.maxAlternatives = 1;
+                    recognition.start();
+                    recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        messageInput.value = transcript;
+                        sendUserMessage(transcript);
+                    };
+                    recognition.onerror = () => { alert("لم يتم التعرف على الصوت، حاول مجدداً"); };
+                };
+                reader.readAsDataURL(audioBlob);
+                stream.getTracks().forEach(track => track.stop());
+            };
+            mediaRecorder.start();
+            isRecording = true;
+            voiceBtn.style.background = "#ef4444";
+            voiceBtn.innerHTML = "⏹️";
+            setTimeout(() => { if (isRecording) stopRecording(); }, 10000); // auto stop after 10s
+        } catch (err) { alert("الجهاز لا يدعم التسجيل الصوتي أو لم يُمنح الإذن"); }
+    }
+    function stopRecording() {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+            isRecording = false;
+            voiceBtn.style.background = "#3b82f6";
+            voiceBtn.innerHTML = "🎤";
+        }
+    }
+    voiceBtn.addEventListener('click', () => { if (isRecording) stopRecording(); else startRecording(); });
+
     function loadWelcomeMessage() {
-        chatWindow.innerHTML = `<div class="message bot-message"><div class="bubble">🚀✨ أهلاً بك في <strong>Cerebonix AI Pro</strong> – أذكى مساعد لـ <strong>سوبر ماركت المصري</strong> وخدمة <strong>Markit</strong>!<br><br>⚡ <strong>Cerebonix - أسرع 20 مرة</strong><br>📦 عندنا: ألبان، لحوم، خضار، فواكه، معلبات، مواد تنظيف، وكل احتياجاتك 🛍️<br>💰 الأسعار: قريباً سندخل البضاعة مع الأسعار بالكامل!<br>📞 <a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b;">واتساب +96170257354</a><br>اسألني عن أي شي، أنا صنع <strong>محمد حلاق</strong> 🙌</div></div>`;
+        chatWindow.innerHTML = `<div class="message bot-message"><div class="bubble">🚀✨ أهلاً بك في <strong>Cerebonix AI Pro</strong> – أذكى مساعد لـ <strong>سوبر ماركت المصري</strong> وخدمة <strong>Markit</strong>!<br><br>⚡ <strong>Cerebonix - أسرع 20 مرة</strong><br>📦 عندنا: ألبان، لحوم، خضار، فواكه، معلبات، مواد تنظيف، وكل احتياجاتك 🛍️<br>💰 الأسعار: قريباً سندخل البضاعة مع الأسعار بالكامل!<br>📍 <strong>عنوان المتجر على الخريطة:</strong> <a href="https://www.google.com/maps?q=34.4367,35.8343" target="_blank" style="color:#f59e0b;">🗺️ اضغط للموقع (الميناء - جامع السلام)</a><br>📞 <a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b;">واتساب +96170257354</a><br>اسألني عن أي شي، أنا صنع <strong>محمد حلاق</strong> 🙌</div></div>`;
     }
 
     function clearChat() { if(confirm('مسح المحادثة؟')) { conversationHistory = []; loadWelcomeMessage(); localStorage.removeItem('chat_history'); } }
@@ -812,16 +844,16 @@
             switchTab('chat');
             alert('تم تسجيل الخروج.');
         } else {
-            let email = prompt("📧 أدخل بريدك الإلكتروني (اختياري، يمكنك تركه فارغاً):");
+            let email = prompt("📧 أدخل بريدك الإلكتروني (اختياري):");
             if(email === null) return;
-            let name = prompt("👤 أدخل اسمك (سيتم الترحيب بك):");
+            let name = prompt("👤 أدخل اسمك:");
             if(name === null) return;
             if(name.trim() === "") name = "صديق";
             if(email.trim() === "") email = "غير مسجل";
             currentUser = { email: email.trim(), name: name.trim() };
             localStorage.setItem('cerebonix_user', JSON.stringify(currentUser));
             updateUserUI();
-            alert(`مرحباً ${currentUser.name}! تم تسجيل دخولك بنجاح.`);
+            alert(`مرحباً ${currentUser.name}!`);
             addMessageToUI(`🎉 مرحباً ${currentUser.name}، سعيد برؤيتك! كيف يمكنني مساعدتك اليوم؟`, 'assistant');
         }
     }
