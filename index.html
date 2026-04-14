@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -569,6 +568,31 @@
     let apiKey = localStorage.getItem('groq_api_key') || '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';
     let currentUser = JSON.parse(localStorage.getItem('cerebonix_user')) || null;
     
+    // ---- نظام الإجابات الجاهزة (لتجنب استنزاف API) ----
+    const localAnswers = new Map([
+        [/مواعيد التوصيل|توصيل|وقت التوصيل|ساعة التوصيل/i, "⏰ *مواعيد التوصيل عبر Markit:* يومياً من الساعة 9 صباحاً حتى 10 مساءً. 🚚 يتم التوصيل لكل المناطق."],
+        [/شحن الدلفري|رسوم التوصيل|سعر التوصيل|كم توصيل|بداوي|قلمون|المنية/i, "🚚 *رسوم التوصيل التفصيلية:*\n• المناطق القريبة (الميناء، نقابة الأطباء): 160,000 ليرة لبنانية.\n• المناطق البعيدة (بداوي، قلمون، المنية، ضهر العين، بحصاص، التل، الزاهرية، القبة): 180,000 ليرة لبنانية.\n📞 للاستفسار: واتساب +96170257354"],
+        [/من صنعك|صانعك|المطور|مين عمل|برمجك/i, "🤖 *أنا Cerebonix AI Pro*، صانعي هو المبرمج اللبناني *محمد حلاق* 🇱🇧، وتم تطويري لتقديم أسرع وأذكى مساعدة لسوبر ماركت نبيل المصري وخدمة Markit ⚡"],
+        [/بضاعة|عندكم شو|المنتجات|متوفر|الموجودات/i, "🛍️ *بضاعة سوبر ماركت نبيل المصري:*\n🥛 ألبان وأجبان | 🥫 معلبات | ❄️ مواد مجمدة | 🍚 حبوب وأرز وعدس | 🍎 فواكه طازجة | 🥬 خضروات طازجة | 🧴 مواد تنظيف | 🍳 زيت وبهارات وبيض | 🍞 مخبوزات | 🥤 مشروبات.\n✅ جميع المنتجات ذات جودة عالية."],
+        [/الأسعار|بكم|كم سعر|سعر|غالي|رخيص/i, "💰 *بخصوص الأسعار:* حالياً نقوم بإدخال جميع الأسعار بشكل دقيق في النظام. يمكنك الاستفسار المباشر عبر واتساب المحل: +96170257354 وسيتم الرد عليك فوراً 🙏"],
+        [/رابط تطبيق Markit|تحميل Markit|تطبيق ماركت|app link/i, "📱 *رابط تحميل تطبيق Markit الرسمي:*\n🔗 https://play.google.com/store/apps/details?id=com.markitworld.app\n📲 حمّله الآن واستمتع بخدمة التوصيل السريعة!"],
+        [/ساعات العمل|الدوام|متى مفتوح|وقت الدوام/i, "🕒 *ساعات عمل سوبر ماركت المصري:*\n• من 8 صباحاً حتى 11 مساءً يومياً.\n• توصيل Markit: من 9 صباحاً حتى 10 مساءً."],
+        [/عنوان السوبر ماركت بالخريطة|الموقع على الخريطة|خرائط|مكان المتجر/i, "📍 *عنوان المتجر على الخريطة:*\n🗺️ https://www.google.com/maps?q=34.4367,35.8343\nالموقع: طرابلس، الميناء، السنترال - جامع السلام."],
+        [/واتساب|تواصل|رقم المحل/i, "📞 *تواصل معنا عبر واتساب:*\n+96170257354 (متاح للاستفسارات والطلبات)"],
+        [/كيفية استخدام تطبيق Markit|طريقة استخدام|كيف أطلب/i, "📱 *خطوات استخدام تطبيق Markit:*\n1. حمّل التطبيق من الرابط أعلاه.\n2. أدخل رقم هاتفك (سيصلك رمز تحقق عبر واتساب).\n3. فعّل تحديد الموقع GPS.\n4. أدخل عنوانك بالتفصيل.\n5. تصفح المنتجات وأضفها للسلة.\n6. اختر طريقة الدفع وأكد الطلب.\n✨ إذا كان المنتج غير متوفر، سيتصل بك فريق Markit فوراً ويقترح بديلاً."],
+        [/مساعدة|مشكلة|عطل|لا يعمل/i, "🆘 *كيف أساعدك؟*\nإذا واجهت مشكلة في التطبيق أو التوصيل، أخبرني بالتفاصيل وسأحاول حلها خطوة بخطوة. يمكنك أيضاً مراسلة واتساب المحل: +96170257354"]
+    ]);
+    
+    // دالة البحث عن إجابة جاهزة
+    function getLocalAnswer(userMessage) {
+        for (let [pattern, answer] of localAnswers.entries()) {
+            if (pattern.test(userMessage)) {
+                return answer;
+            }
+        }
+        return null;
+    }
+
     const SYSTEM_PROMPT = `أنت "Cerebonix AI" – مساعد ذكي لـ "سوبر ماركت المصري" وخدمة "Markit". ردودك طبيعية، منسقة، ولا تظهر أي كود CSS أو HTML أو أخطاء برمجية. أنت ترد بجمل عربية سليمة فقط.
  🎯 معلومات أساسية:
 - صانعك: "محمد حلاق".
@@ -614,7 +638,7 @@
         let newText = text;
         newText = newText.replace(/(https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.markitworld\.app)/g, `<a href="$1" target="_blank" style="color:#f59e0b; font-weight:bold;">📲 اضغط لتحميل تطبيق Markit</a>`);
         newText = newText.replace(/(\+96170257354)/g, `<a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b; font-weight:bold;">$1 (واتساب)</a>`);
-        newText = newText.replace(/عنوان المتجر\s*الخريطة/gi, '📍 عنوان المتجر على الخريطة: <a href="https://www.google.com/maps?q=34.4367,35.8343" target="_blank" style="color:#f59e0b;">🗺️ اضغط للموقع</a>');
+        newText = newText.replace(/https:\/\/www\.google\.com\/maps\/[^\s]+/g, (match) => `<a href="${match}" target="_blank" style="color:#f59e0b;">🗺️ اضغط للموقع</a>`);
         return newText;
     }
 
@@ -737,12 +761,10 @@
         if (!message) return;
         if (!text) {
             messageInput.value = '';
-            // إخفاء الكيبورد بعد الإرسال
             messageInput.blur();
         }
         addMessageToUI(message, 'user');
         
-        // Check for specific "ارسلها عبر واتساب" request
         if (message.includes("واتساب") && (message.includes("ارسل") || message.includes("أرسل"))) {
             sendToWhatsApp(message);
             isWaitingForResponse = false;
@@ -752,6 +774,22 @@
         isWaitingForResponse = true;
         sendBtn.disabled = true;
         voiceBtn.disabled = true;
+        
+        // 1. محاولة الإجابة الجاهزة أولاً
+        let localAnswer = getLocalAnswer(message);
+        if (localAnswer) {
+            // تأخير بسيط لمحاكاة التفكير (0.7 ثانية) قبل الرد
+            showTyping();
+            await new Promise(resolve => setTimeout(resolve, 700));
+            removeTyping();
+            addMessageToUI(autoLinkify(localAnswer), 'assistant');
+            isWaitingForResponse = false;
+            sendBtn.disabled = false;
+            voiceBtn.disabled = false;
+            return;
+        }
+        
+        // 2. إذا لم يجد إجابة جاهزة، يتجه إلى API
         showTyping();
         try {
             const reply = await callGroq(message);
@@ -780,7 +818,6 @@
                 const reader = new FileReader();
                 reader.onloadend = async () => {
                     const base64data = reader.result.split(',')[1];
-                    // استخدام Web Speech API للتعرف الصوتي
                     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
                     recognition.lang = 'ar-LB';
                     recognition.interimResults = false;
@@ -800,7 +837,7 @@
             isRecording = true;
             voiceBtn.style.background = "#ef4444";
             voiceBtn.innerHTML = "⏹️";
-            setTimeout(() => { if (isRecording) stopRecording(); }, 10000); // auto stop after 10s
+            setTimeout(() => { if (isRecording) stopRecording(); }, 10000);
         } catch (err) { alert("الجهاز لا يدعم التسجيل الصوتي أو لم يُمنح الإذن"); }
     }
     function stopRecording() {
