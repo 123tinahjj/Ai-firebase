@@ -27,6 +27,7 @@
             --message-bot-bg: #f1f5f9;
             --message-bot-text: #1e2a3e;
             --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --faq-hover: #fef3c7;
         }
 
         body.dark {
@@ -38,6 +39,7 @@
             --text-secondary: #94a3b8;
             --message-bot-bg: #334155;
             --message-bot-text: #f1f5f9;
+            --faq-hover: #334155;
         }
 
         body {
@@ -193,6 +195,11 @@
             background: var(--accent);
             color: white;
             box-shadow: 0 6px 14px var(--accent-glow);
+        }
+
+        .menu-item:hover:not(.active) {
+            background: var(--border-light);
+            color: var(--text-primary);
         }
 
         .content-panel {
@@ -485,6 +492,65 @@
             display: inline-block;
             margin-top: 8px;
         }
+
+        .faq-container {
+            padding: 16px;
+            overflow-y: auto;
+            height: 100%;
+        }
+        .faq-category {
+            margin-bottom: 24px;
+        }
+        .faq-category h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+        .faq-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .faq-question {
+            background: var(--border-light);
+            padding: 12px 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .faq-question:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateX(-5px);
+        }
+        .faq-question .emoji {
+            font-size: 1.2rem;
+        }
+        .faq-note {
+            background: var(--accent-glow);
+            padding: 12px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            border-right: 3px solid var(--accent);
+        }
+        .key-status {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .key-working { background: #22c55e20; color: #22c55e; }
+        .key-failed { background: #ef444420; color: #ef4444; }
     </style>
 </head>
 <body>
@@ -508,6 +574,7 @@
     <div class="main-layout">
         <div class="sidebar" id="sidebar">
             <div class="menu-item active" data-tab="chat">💬 المحادثة الذكية</div>
+            <div class="menu-item" data-tab="faq">❓ الأسئلة الشائعة</div>
             <div class="menu-item" data-tab="info">ℹ️ معلومات المتجر & التطبيق</div>
             <div class="menu-item" data-tab="settings" id="settingsMenuItem">⚙️ إعدادات API</div>
         </div>
@@ -522,7 +589,7 @@
                 <div class="quick-chip" data-question="شحن الدلفري لبداوي">🚚 سعر التوصيل لبداوي</div>
                 <div class="quick-chip" data-question="من صنعك؟">🤖 من صنعك؟</div>
                 <div class="quick-chip" data-question="ماذا لديكم بضاعة؟">🛍️ البضاعة المتوفرة</div>
-                <div class="quick-chip" data-question="الأسعار؟">💰 استفسار عن الأسعار</div>
+                <div class="quick-chip" data-question="بدي طلبية على القبة">📍 طلبية للقبة</div>
                 <div class="quick-chip" data-question="رابط تطبيق Markit">📱 رابط التطبيق</div>
                 <div class="quick-chip" data-question="ساعات العمل">🕒 ساعات العمل</div>
                 <div class="quick-chip" data-question="عنوان السوبر ماركت بالخريطة">📍 عنوان المتجر على الخريطة</div>
@@ -544,165 +611,207 @@
             </div>
 
             <div id="settingsPanel" class="info-panel hidden">
-                <h2>⚙️ إعدادات Groq API</h2>
+                <h2>⚙️ إعدادات API الاحتياطية</h2>
                 <hr style="margin: 15px 0; border-color: var(--border-light);">
-                <p style="margin-bottom: 15px;">🔐 <strong>مفتاح API يعمل بكفاءة عالية!</strong></p>
-                <label style="display: block; margin-bottom: 10px; font-weight: 600;">📝 مفتاح Groq API:</label>
-                <input type="password" id="apiKeyInput" placeholder="أدخل مفتاح API" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-light); background: var(--bg-body); color: var(--text-primary); margin-bottom: 15px; direction: ltr;">
-                <button id="saveApiKeyBtn" style="background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 600;">💾 حفظ المفتاح</button>
-                <button id="testApiBtn" style="background: var(--border-light); color: var(--text-primary); border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-right: 10px;">🔌 اختبار الاتصال</button>
+                <p style="margin-bottom: 15px;">🔐 <strong>نظام التبديل التلقائي بين 3 مفاتيح</strong> - إذا فشل مفتاح ينتقل للذي يليه</p>
+                <div id="keysStatusList" style="margin-bottom: 15px; padding: 10px; background: var(--border-light); border-radius: 12px;"></div>
+                <button id="testAllKeysBtn" style="background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 600;">🔌 اختبار جميع المفاتيح</button>
+                <button id="addKeyBtn" style="background: var(--border-light); color: var(--text-primary); border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-right: 10px;">➕ إضافة مفتاح جديد</button>
                 <div id="apiStatus" style="margin-top: 15px; padding: 10px; border-radius: 12px; font-size: 0.9rem;"></div>
             </div>
 
+            <div id="faqPanel" class="info-panel hidden">
+                <div class="faq-container">
+                    <div class="faq-note">
+                        💡 <strong>ملاحظة:</strong> إذا كان الـ AI لا يفهم سؤالك أو تريد إجابة فورية وسريعة، يمكنك اختيار سؤالك من القائمة أدناه.
+                    </div>
+                    <div class="faq-category">
+                        <h3>🚚 التوصيل والشحن</h3>
+                        <div class="faq-grid">
+                            <div class="faq-question" data-question="بدي طلبية على القبة"><span class="emoji">📍</span> بدي طلبية على القبة</div>
+                            <div class="faq-question" data-question="مواعيد التوصيل؟"><span class="emoji">⏰</span> مواعيد التوصيل</div>
+                            <div class="faq-question" data-question="سعر التوصيل لبداوي؟"><span class="emoji">🚚</span> سعر التوصيل لبداوي</div>
+                            <div class="faq-question" data-question="توصيل سريع فلاش؟"><span class="emoji">⚡</span> توصيل سريع فلاش</div>
+                        </div>
+                    </div>
+                    <div class="faq-category">
+                        <h3>🏪 المتجر والبضاعة</h3>
+                        <div class="faq-grid">
+                            <div class="faq-question" data-question="عنوان السوبر ماركت بالخريطة؟"><span class="emoji">🗺️</span> عنوان المتجر</div>
+                            <div class="faq-question" data-question="ساعات العمل؟"><span class="emoji">🕒</span> ساعات العمل</div>
+                            <div class="faq-question" data-question="البضاعة المتوفرة؟"><span class="emoji">🛍️</span> البضاعة المتوفرة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="input-area">
-                <input type="text" id="messageInput" placeholder="اسأل: بدي اعرف شحن الدلفري، أو من صنعك؟ أو شو عندكم بضاعة؟..." autocomplete="off">
+                <input type="text" id="messageInput" placeholder="اسأل: بدي طلبية على القبة، أو شو عندكم بضاعة؟..." autocomplete="off">
                 <button class="voice-btn" id="voiceBtn" title="تسجيل صوتي">🎤</button>
                 <button class="send-btn" id="sendBtn">➤</button>
             </div>
-            <footer>⚡ Cerebonix AI Pro | صنع بواسطة محمد حلاق 🇱🇧 | دعم صوتي وخرائط</footer>
+            <footer>⚡ Cerebonix AI Pro | صنع بواسطة محمد حلاق 🇱🇧 | نظام تبديل تلقائي بين 3 مفاتيح API</footer>
         </div>
     </div>
 </div>
 
 <script>
-    let apiKey = localStorage.getItem('groq_api_key') || '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';
+    // ============================================================
+    // 🔑 مصفوفة المفاتيح الاحتياطية (3 مفاتيح)
+    // ============================================================
+    let apiKeysList = [
+        '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',  // المفتاح الأساسي
+        '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',  // المفتاح الثاني
+        'gsk_placeholder_key_3_replace_me'  // مفتاح ثالث (استبدله بمفتاح حقيقي عندك)
+    ];
+    
+    let currentKeyIndex = 0;
+    let allKeysFailed = false;
     let currentUser = JSON.parse(localStorage.getItem('cerebonix_user')) || null;
     
-    // ---- نظام الإجابات الجاهزة (لتجنب استنزاف API) ----
-    const localAnswers = new Map([
-        [/مواعيد التوصيل|توصيل|وقت التوصيل|ساعة التوصيل/i, "⏰ *مواعيد التوصيل عبر Markit:* يومياً من الساعة 9 صباحاً حتى 10 مساءً. 🚚 يتم التوصيل لكل المناطق."],
-        // 1. سياسة الاستبدال والاسترجاع
-[/استبدال|استرجاع|رد المنتج|بدل المنتج|ما عجبني المنتج|المنتج خربان/i, 
-"🔁 *سياسة الاستبدال عندنا:*\n• إذا المنتج وصل خربان أو عيب فيه، بتواصل معنا واتساب خلال 24 ساعة.\n• منبعثلك مندوب ونبدله مجاناً.\n• الاسترجاع بدون سبب خلال 3 أيام بشرط العبوة ما تكون منفتحة.\n📞 للتبديل: واتساب +96170257354"],
-
-// 2. طرق الدفع
-[/طريقة الدفع|شو بدفع|كيف بدفع|دفع كاش|دفع أونلاين|باي بال|كريديت كارد|فيزا/i, 
-"💳 *طرق الدفع المتاحة:*\n• كاش عند الاستلام (أيد بأيد مع المندوب).\n• أونلاين عبر التطبيق (فيزا/ماستركارد).\n• أونلاين عبر واتساب (تحويل بنكي أو أومت).\n❌ ما في باي بال حالياً."],
-
-   [/مواعيد التوصيل|توصيل|وقت التوصيل|ساعة التوصيل|بيوصلو|المناديب|شو وقت التوصيل/i, "⏰ *يا هلا* 🌟 التوصيل عبر Markit يومياً من الساعة 9 الصبح للساعة 10 الليل. بنوصل لكل المناطق 🚚"],
+    // حفظ المفاتيح في localStorage
+    function saveApiKeys() {
+        localStorage.setItem('groq_api_keys', JSON.stringify(apiKeysList));
+    }
     
-    [/شحن الدلفري|رسوم التوصيل|سعر التوصيل|كم توصيل|بداوي|قلمون|المنية|المنطقة|اديه شحن|بكم شحن/i, "🚚 *رسوم التوصيل:*\n• قريبة (الميناء، نقابة الأطباء): 160,000 ليرة\n• بعيدة (البداوي، قلمون، المنية، ضهر العين، بحصاص، التل، الزاهرية، القبة، أبو سمراء، الضم والفرز، جبل محسن، التبانة): 180,000 ليرة\n📞 استفسار: واتساب +96170257354"],
-    
-    [/من صنعك|صانعك|المطور|مين عمل|برمجك|مين عاملك|شو اسمك/i, "🤖 *أنا Cerebonix AI Pro*، صانعي المبرمج اللبناني *محمد حلاق* 🇱🇧، عم يطورني عشان أساعدك بأسرع وقت بسوبر ماركت نبيل المصري وخدمة Markit ⚡"],
-    
-    [/بضاعة|عندكم شو|المنتجات|متوفر|الموجودات|شو عندكم|شنو في/i, "🛍️ *عندنا بالسوبر ماركت:*\n🥛 ألبان وأجبان | 🥫 معلبات | ❄️ مجمدات | 🍚 أرز وعدس وحبوب | 🍎 فواكه طازجة | 🥬 خضرة طازجة | 🧴 تنظيف | 🍳 زيت وبهارات وبيض | 🍞 خبز ومعجنات | 🥤 مشروبات\n✅ كلشي عندنا جودة عالية"],
-    
-    [/الأسعار|بكم|كم سعر|سعر|غالي|رخيص|اديش|قديش|بكم هيدا/i, "💰 *سعر هيدا؟* كافة المنتجات والأسعار موجودة عالتطبيق تبعنا. نزله من الرابط: https://play.google.com/store/apps/details?id=com.markitworld.app وهناك بتلاقي كل التفاصيل 👍"],
-    
-    [/رابط تطبيق Markit|تحميل Markit|تطبيق ماركت|app link|نزله|بدي التطبيق/i, "📱 *رابط تحميل تطبيق Markit:*\n🔗 https://play.google.com/store/apps/details?id=com.markitworld.app\n📲 نزله هلأ واستمتع بالتوصيل السريع!"],
-    
-    [/ساعات العمل|الدوام|متى مفتوح|وقت الدوام|شو ساعاتكم/i, "🕒 *دوام سوبر ماركت المصري:*\n• من 8 الصبح لـ 11 الليل يومياً\n• توصيل Markit: من 9 الصبح لـ 10 الليل"],
-    
-    [/عنوان السوبر ماركت بالخريطة|الموقع على الخريطة|خرائط|مكان المتجر|وين موقعكم/i, "📍 *عنوانا عالخريطة:*\n🗺️ https://www.google.com/maps?q=34.4367,35.8343\nالموقع: طرابلس، الميناء، السنترال - جامع السلام 🏪"],
-    
-    [/واتساب|تواصل|رقم المحل|بدي احكي معكم/i, "📞 *واتساب تبعنا:*\n+96170257354 (للاستفسارات والطلبات)"],
-    
-    [/كيفية استخدام تطبيق Markit|طريقة استخدام|كيف أطلب|شو الطريقة/i, "📱 *خطوات استخدام تطبيق Markit:*\n1. نزل التطبيق من الرابط\n2. دخّل رقم تلفونك (بيوصلك رمز عالمسج)\n3. فعّل الموقع GPS\n4. اكتب عنوانك بالتفصيل\n5. تصفح المنتجات وضيف عالسلة\n6. اختار طريقة الدفع وأكد الطلب\n✨ إذا المنتج مش متوفر، بيتصل فيك فريق Markit ويعطيك بديل"],
-    
-    [/مساعدة|مشكلة|عطل|لا يعمل|بطل يشتغل/i, "🆘 *شو صار معك؟* إذا عندك مشكلة بالتطبيق أو التوصيل، احكيلي شو بالزبط وبراجعلك خطوة خطوة. أو تواصل واتساب: +96170257354"],
-    
-    // القواعد الجديدة باللهجة اللبنانية
-    [/هل يمكنني أن أطلب هنا|أطلب هنا|الطلب هنا|بدي طلب من هلئ|طلب هون/i, "للأسف لا، الطلب بس عبر واتساب. تواصل معنا عالرقم +96170257354 🙏"],
-    
-    [/سعر التوصيل لأي مكان بطرابلس|توصيل طرابلس|سعر توصيل طرابلس|كم توصيل لطرابلس/i, "سعر التوصيل لأي مكان بطربلس 180 ألف. بس إذا عنوانك جنب نقابة الأطباء أو جنب متجر المصري (قريب كتير) بصير التوصيل 160 ألف فقط ✅"],
-    
-    [/سعر.*معين|سعر الشي|بكم هذا|ثمن هذا|قديش هيدا|هاد بكم/i, "هاد المنتج لسا ما دخلنا سعره بالنظام. مع الوقت منضل ندخل كلشي. تحمل علينا شوي 🙏"],
-    
-    [/طلبي|الطلب حقى|وين طلبي|طلبى|وصل طلبي/i, "والله ما عندي معلومات عن طلبك. بدك تحكي مع الشركة مباشرة عالواتساب: +96170257354"],
-    
-    [/مرحبا|هلا|hi|hello|hii|كيفك|كيفك انت|شو اخبارك|يا هلا/i, "يا هلا وسهلا فيك 🌟 أهلاً وسهلاً، أنا خدمة Markit والمصري. شو بتحب تسأل؟"],
-    
-    [/شو بتعرف|شو بتقدم|شنو اختصاصك/i, "أنا هون لخدمتك بسوبر ماركت نبيل المصري وتطبيق Markit. أسأل عن التوصيل، ساعات العمل، المنتجات، تطبيق Markit، أو أي شي يخص السوبر ماركت. وإذا ما عندي جواب، بحولك عالواتساب 📞"],
-// 4. وقت تحضير الطلب
-[/وقت التحضير|قديش بدك تحضر الطلب|الطلب بيوصل قديش|كم دقيقة/i, 
-"⏱️ *وقت تجهيز الطلب:*\n• التطبيق: الطلب بيوصلك خلال 30-60 دقيقة.\n• واتساب: بيوصل خلال 45-90 دقيقة حسب زحمة المناديب.\n• في حال التأخير، بيتصل فيك المندوب."],
-
-// 5. العروض والخصومات
-[/عروض|خصم|تخفيض|عندكم عروض|شو في عروض|عرض اليوم|تنزيلات/i, 
-"🎉 *العروض الحالية:*\n• كل يوم ثلاثاء: خصم 10% على الألبان والأجبان.\n• كل خميس: خصم 15% على مواد التنظيف.\n• آخر الشهر: تخفيضات تصل لـ 25%.\n📱 العروض اليومية موجودة بالتطبيق، نزله وشوف!"],
-
-// 6. المناطق اللي منوصلش
-[/مناطق ما بتوصلو|ما بتوصلو|عندكم توصيل لكل المناطق|في مناطق ما بتوصلو/i, 
-"📍 *المناطق اللي منوصلش:*\n• حالياً بنوصل لكل مناطق طرابلس والجوار.\n• ما منوصلش: الهرمل، عكار (بعد المنيّة)، البقاع الشمالي.\n• إذا منطقتك حدودية، اتصل واتساب نتأكد."],
-
-// 1. المنتجات اللي عندنا أو ما عندنا (نعم/لا)
-[/عندكم خمرة|عندكم كحول|بيرة|خمر|ويسكي|عندكم دخان|سجائر|تبغ/i, 
-"🍺 *للعلم:* ما منبيع كحول ولا دخان بالسوبر ماركت. بس عندنا عصائر طبيعية ومشروبات غازية وبيرة خالية من الكحول. شكراً لتفهمك 🙏"],
-
-// 2. خدمة التوصيل السريع (فلاش)
-[/توصيل سريع|فلاش|مستعجل|بدي إياه هلأ|أسرع شي|كم دقيقة بيوصل/i, 
-"⚡ *توصيل فلاش (مستعجل):*\n• بيوصل خلال 20-30 دقيقة.\n• رسم إضافي: 50,000 ليرة زيادة عالسعر العادي.\n• للطلب المستعجل: اتصل واتساب +96170257354 وقله 'بدي فلاش'"],
-
-// 3. الغاء الطلب
-[/الغي الطلب|كنسل الطلب|بدي ألغي|ما بدي الطلب|أوقف الطلب/i, 
-"❌ *إلغاء الطلب:*\n• قبل ما المندوب يطلع من المحل: مجاني.\n• بعد ما المندوب طلع: بتدفع 50,000 ليرة تعب طريق.\n• للالغاء: اتصل واتساب فوراً +96170257354"],
-
-// 4. الدعم الفني للتطبيق
-[/التطبيق معلق|التطبيق ما عم يشتغل|ما بقدر أسجل دخول|نسيت الرمز|ما وصلني رمز/i, 
-"📱 *مشاكل التطبيق:*\n• إذا ما وصلك رمز التحقق: تأكد من رقم الهاتف واتصل بنا.\n• إذا التطبيق معلق: امسح البيانات من الإعدادات أو نزله مرة تانية.\n• للدعم الفني: واتساب +96170257354 (قله 'دعم تقني')"],
-
-// 5. الكميات والجملة
-[/شراء جملة|كمية كبيرة|بالجملة|بدي كرتونة|بدي صندوق|تخفيض جملة/i, 
-"📦 *الشراء بالجملة:*\n• إذا بدك كمية كبيرة (أكثر من 10 كراتين)، في تخفيضات خاصة.\n• تواصل مع مسؤول الجملة عالواتساب: +96170257354.\n• أقل كمية للجملة: 500,000 ليرة."],
-
-// 6. عروض التوصيل المجاني
-[/توصيل مجاني|بدون شحن|شحن بلاش|مجاني/i, 
-"🎁 *التوصيل المجاني:*\n• للطلبات فوق 500,000 ليرة داخل طرابلس.\n• كل يوم جمعة: توصيل مجاني لطلبات 400,000 فأكثر.\n• عروض خاصة شهرية: تابعونا عالواتساب 📞"],
-
-// 7. أوقات الذروة (بطء التوصيل)
-[/أوقات الذروة|في زحمة|بيكون في تأخير|شو أحسن وقت أطلب/i, 
-"⏰ *أحسن وأسوأ وقت للتوصيل:*\n• أحسن وقت: 10 الصبح - 12 الظهر (أسرع توصيل).\n• أسوأ وقت: 5 العصر - 9 الليل (زحمة مناديب، تأخير 30-60 دقيقة).\n• الجمعة والسبت: أشد زحمة."],
-
-// 8. أسئلة الزبائن المزعجة (التعامل مع الزبون العصباني)
-[/وين طلبي تأخر|جاي متأخر|من كتر ما استنيت|عصبي|بدي شكوى/i, 
-"😊 *آسف على التأخير يا غالي.*\n• المندوب حالياً بالطريق، بتواصل معك خلال 10 دقائق.\n• إذا بدك تشتكي: تواصل مع مدير الخدمة عالواتساب +96170257354.\n• تعتذر على الإزعاج، وعدنا ما تتكرر 🙏"],
-
-// 7. المنتجات الأكثر طلباً
-[/المنتجات الأكثر طلباً|شو أكتر شي بتطلبوه|أشهر منتج|بياعكم الأكثر/i, 
-"🔥 *أكتر 5 منتجات مطلوبة عندنا:*\n1. خبز عربي طازج.\n2. حليب وكريما.\n3. جبنة حلوم وبالديني.\n4. زيت زيتون بكر.\n5. مرقة دجاج ماجي.\n📱 بالتطبيق بتلاقي قسم 'الأكثر مبيعاً'."],
-        [/شحن الدلفري|رسوم التوصيل|سعر التوصيل|كم توصيل|بداوي|قلمون|المنية/i, "🚚 *رسوم التوصيل التفصيلية:*\n• المناطق القريبة (الميناء، نقابة الأطباء): 160,000 ليرة لبنانية.\n• المناطق البعيدة (بداوي، قلمون، المنية، ضهر العين، بحصاص، التل، الزاهرية، القبة): 180,000 ليرة لبنانية.\n📞 للاستفسار: واتساب +96170257354"],
-        [/من صنعك|صانعك|المطور|مين عمل|برمجك/i, "🤖 *أنا Cerebonix AI Pro*، صانعي هو المبرمج اللبناني *محمد حلاق* 🇱🇧، وتم تطويري لتقديم أسرع وأذكى مساعدة لسوبر ماركت نبيل المصري وخدمة Markit ⚡"],
-        [/بضاعة|عندكم شو|المنتجات|متوفر|الموجودات/i, "🛍️ *بضاعة سوبر ماركت نبيل المصري:*\n🥛 ألبان وأجبان | 🥫 معلبات | ❄️ مواد مجمدة | 🍚 حبوب وأرز وعدس | 🍎 فواكه طازجة | 🥬 خضروات طازجة | 🧴 مواد تنظيف | 🍳 زيت وبهارات وبيض | 🍞 مخبوزات | 🥤 مشروبات.\n✅ جميع المنتجات ذات جودة عالية."],
-        [/الأسعار|بكم|كم سعر|سعر|غالي|رخيص/i, "💰 *بخصوص الأسعار:* حالياً نقوم بإدخال جميع الأسعار بشكل دقيق في النظام. يمكنك الاستفسار المباشر عبر واتساب المحل: +96170257354 وسيتم الرد عليك فوراً 🙏"],
-        [/رابط تطبيق Markit|تحميل Markit|تطبيق ماركت|app link/i, "📱 *رابط تحميل تطبيق Markit الرسمي:*\n🔗 https://play.google.com/store/apps/details?id=com.markitworld.app\n📲 حمّله الآن واستمتع بخدمة التوصيل السريعة!"],
-        [/ساعات العمل|الدوام|متى مفتوح|وقت الدوام/i, "🕒 *ساعات عمل سوبر ماركت المصري:*\n• من 8 صباحاً حتى 11 مساءً يومياً.\n• توصيل Markit: من 9 صباحاً حتى 10 مساءً."],
-        [/عنوان السوبر ماركت بالخريطة|الموقع على الخريطة|خرائط|مكان المتجر/i, "📍 *عنوان المتجر على الخريطة:*\n🗺️ https://www.google.com/maps?q=34.4367,35.8343\nالموقع: طرابلس، الميناء، السنترال - جامع السلام."],
-        [/واتساب|تواصل|رقم المحل/i, "📞 *تواصل معنا عبر واتساب:*\n+96170257354 (متاح للاستفسارات والطلبات)"],
-        [/كيفية استخدام تطبيق Markit|طريقة استخدام|كيف أطلب/i, "📱 *خطوات استخدام تطبيق Markit:*\n1. حمّل التطبيق من الرابط أعلاه.\n2. أدخل رقم هاتفك (سيصلك رمز تحقق عبر واتساب).\n3. فعّل تحديد الموقع GPS.\n4. أدخل عنوانك بالتفصيل.\n5. تصفح المنتجات وأضفها للسلة.\n6. اختر طريقة الدفع وأكد الطلب.\n✨ إذا كان المنتج غير متوفر، سيتصل بك فريق Markit فوراً ويقترح بديلاً."],
-        [/مساعدة|مشكلة|عطل|لا يعمل/i, "🆘 *كيف أساعدك؟*\nإذا واجهت مشكلة في التطبيق أو التوصيل، أخبرني بالتفاصيل وسأحاول حلها خطوة بخطوة. يمكنك أيضاً مراسلة واتساب المحل: +96170257354"]
-    ]);
-    
-    // دالة البحث عن إجابة جاهزة
-    function getLocalAnswer(userMessage) {
-        for (let [pattern, answer] of localAnswers.entries()) {
-            if (pattern.test(userMessage)) {
-                return answer;
-            }
+    // تحميل المفاتيح من localStorage
+    function loadApiKeys() {
+        const saved = localStorage.getItem('groq_api_keys');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (parsed && parsed.length > 0) {
+                    apiKeysList = parsed;
+                }
+            } catch(e) {}
         }
+        updateKeysStatusUI();
+    }
+    
+    // إضافة مفتاح جديد
+    function addNewKey() {
+        const newKey = prompt("📝 أدخل مفتاح Groq API الجديد:");
+        if (newKey && newKey.trim() && newKey.trim().startsWith('gsk_')) {
+            apiKeysList.push(newKey.trim());
+            saveApiKeys();
+            updateKeysStatusUI();
+            showTempMessage("✅ تم إضافة المفتاح الجديد!", "#22c55e");
+        } else if (newKey && newKey.trim()) {
+            alert("⚠️ المفتاح يجب أن يبدأ بـ gsk_");
+        }
+    }
+    
+    function updateKeysStatusUI() {
+        const container = document.getElementById('keysStatusList');
+        if (!container) return;
+        let html = '<strong>🔑 حالة المفاتيح:</strong><br>';
+        apiKeysList.forEach((key, idx) => {
+            const maskedKey = key.substring(0, 15) + '...' + key.substring(key.length - 10);
+            html += `<div style="font-size:0.75rem; margin-top:5px;">${idx+1}. ${maskedKey} <span class="key-status key-working">✅ نشط</span></div>`;
+        });
+        container.innerHTML = html;
+    }
+    
+    function showTempMessage(msg, color = '#f59e0b') {
+        const statusDiv = document.getElementById('apiStatus');
+        if (statusDiv) {
+            statusDiv.innerHTML = `<span style="color:${color};">${msg}</span>`;
+            setTimeout(() => { if(statusDiv) statusDiv.innerHTML = ''; }, 3000);
+        }
+    }
+    
+    // ============================================================
+    // 🧠 نظام الإجابات الجاهزة (ذكي ويفهم السياق الكامل)
+    // ============================================================
+    function getLocalAnswer(userMessage) {
+        const msg = userMessage.toLowerCase();
+        
+        // 🤖 سؤال عن الصانع
+        if (msg.match(/من صنعك|صانعك|المطور|مين عمل|برمجك|شو اسمك|مين عاملك/)) {
+            return "🤖 *أنا Cerebonix AI Pro*، صانعي المبرمج اللبناني *محمد حلاق* 🇱🇧، عم يطورني عشان أساعدك بأسرع وقت بسوبر ماركت نبيل المصري وخدمة Markit ⚡";
+        }
+        
+        // 🛍️ البضاعة المتوفرة
+        if (msg.match(/بضاعة|عندكم شو|المنتجات|متوفر|الموجودات|شو عندكم|شنو في|البضاعة المتوفرة/)) {
+            return "🛍️ *عندنا بالسوبر ماركت:*\n🥛 ألبان وأجبان | 🥫 معلبات | ❄️ مجمدات | 🍚 أرز وعدس وحبوب | 🍎 فواكه طازجة | 🥬 خضرة طازجة | 🧴 تنظيف | 🍳 زيت وبهارات وبيض | 🍞 خبز ومعجنات | 🥤 مشروبات\n✅ كلشي عندنا جودة عالية";
+        }
+        
+        // 📍 طلبية لمنطقة معينة (يفهم السياق: بدي طلبية على القبة، بدي اوصل للقبة، الخ)
+        const deliveryAreaMatch = msg.match(/طلب(ية)?\s*(على|الى|ل)?\s*(القبة|بداوي|قلمون|المنية|الميناء|التبانة|جبل محسن|التل|الزاهرية)/);
+        if (deliveryAreaMatch) {
+            const area = deliveryAreaMatch[3];
+            let price = "180,000";
+            let areaName = area;
+            if (area === 'الميناء') price = "160,000";
+            return `🚚 *طلبك لمنطقة ${areaName}*\n\n• التوصيل متوفر للساعة 10 مساءً\n• سعر التوصيل: ${price} ليرة لبنانية\n• المدة المتوقعة: 30-60 دقيقة\n\nلطلبك: تواصل واتساب +96170257354 📞`;
+        }
+        
+        // ⏰ مواعيد التوصيل
+        if (msg.match(/مواعيد التوصيل|توصيل|وقت التوصيل|ساعة التوصيل|بيوصلو|المناديب|شو وقت التوصيل/)) {
+            return "⏰ *يا هلا* 🌟 التوصيل عبر Markit يومياً من الساعة 9 الصبح للساعة 10 الليل. بنوصل لكل المناطق 🚚";
+        }
+        
+        // 🚚 سعر التوصيل لمنطقة محددة
+        const priceMatch = msg.match(/(سعر التوصيل ل|شحن|اديه شحن|بكم شحن|كم توصيل)\s*(بداوي|قلمون|المنية|القبة|التبانة|جبل محسن|التل|الزاهرية)/);
+        if (priceMatch) {
+            return "🚚 *رسوم التوصيل:*\n• قريبة (الميناء، نقابة الأطباء): 160,000 ليرة\n• بعيدة (البداوي، قلمون، المنية، القبة، ضهر العين، بحصاص، التل، الزاهرية): 180,000 ليرة\n📞 استفسار: واتساب +96170257354";
+        }
+        
+        // 💰 الأسعار (سياق كامل)
+        if (msg.match(/الأسعار|بكم|كم سعر|سعر|غالي|رخيص|اديش|قديش|بكم هيدا/) && !msg.match(/توصيل|شحن/)) {
+            return "💰 *بخصوص الأسعار:* حالياً نقوم بإدخال جميع الأسعار بشكل دقيق في النظام. يمكنك الاستفسار المباشر عبر واتساب المحل: +96170257354 وسيتم الرد عليك فوراً 🙏";
+        }
+        
+        // 📱 رابط التطبيق
+        if (msg.match(/رابط تطبيق Markit|تحميل Markit|تطبيق ماركت|app link|نزله|بدي التطبيق/)) {
+            return "📱 *رابط تحميل تطبيق Markit:*\n🔗 https://play.google.com/store/apps/details?id=com.markitworld.app\n📲 نزله هلأ واستمتع بالتوصيل السريع!";
+        }
+        
+        // 🕒 ساعات العمل
+        if (msg.match(/ساعات العمل|الدوام|متى مفتوح|وقت الدوام|شو ساعاتكم/)) {
+            return "🕒 *دوام سوبر ماركت المصري:*\n• من 8 الصبح لـ 11 الليل يومياً\n• توصيل Markit: من 9 الصبح لـ 10 الليل";
+        }
+        
+        // 📍 عنوان المتجر
+        if (msg.match(/عنوان السوبر ماركت بالخريطة|الموقع على الخريطة|خرائط|مكان المتجر|وين موقعكم/)) {
+            return "📍 *عنوانا عالخريطة:*\n🗺️ https://www.google.com/maps?q=34.4367,35.8343\nالموقع: طرابلس، الميناء، السنترال - جامع السلام 🏪";
+        }
+        
+        // 📞 واتساب
+        if (msg.match(/واتساب|تواصل|رقم المحل|بدي احكي معكم|رقم واتساب المتجر/)) {
+            return "📞 *واتساب تبعنا:*\n+96170257354 (للاستفسارات والطلبات)";
+        }
+        
+        // مرحبا
+        if (msg.match(/مرحبا|هلا|hi|hello|hii|كيفك|كيفك انت|شو اخبارك|يا هلا/)) {
+            return "يا هلا وسهلا فيك 🌟 أهلاً وسهلاً، أنا خدمة Markit والمصري. شو بتحب تسأل؟";
+        }
+        
         return null;
     }
+    
+    // ============================================================
+    // 📝 نظام API مع Fallback بين المفاتيح
+    // ============================================================
+    const SYSTEM_PROMPT = `أنت "Cerebonix AI" – مساعد ذكي لـ "سوبر ماركت المصري" وخدمة "Markit". 
+    
+⚠️ مهم جداً:你必须 فهم سياق الجملة كاملة، لا تاخذ كلمة واحدة وترد عليها. افهم السؤال كاملاً ورد بشكل ذكي ومنطقي.
 
-    const SYSTEM_PROMPT = `أنت "Cerebonix AI" – مساعد ذكي لـ "سوبر ماركت المصري" وخدمة "Markit". ردودك طبيعية، منسقة، ولا تظهر أي كود CSS أو HTML أو أخطاء برمجية. أنت ترد بجمل عربية سليمة فقط.
- 🎯 معلومات أساسية:
+مثلاً: إذا قال المستخدم "بدي طلبية على القبة" فافهم أنه يريد طلب توصيل لمنطقة القبة، ورد عليه بمعلومات التوصيل لهاد المنطقة.
+إذا قال "شو عندكم بضاعة" رد عليه بقائمة المنتجات.
+إذا قال "كم سعر الحليب" رد عليه بأن الأسعار على التطبيق.
+
+🎯 معلومات أساسية:
 - صانعك: "محمد حلاق".
-- المتجر: سوبر ماركت نبيل المصري - الموقع: طرابلس، الميناء، السنترال - جامع السلام. عنوان الخريطة: https://maps.google.com/?q=34.4367,35.8343 (الميناء)
+- المتجر: سوبر ماركت نبيل المصري - الموقع: طرابلس، الميناء، السنترال - جامع السلام.
+- واتساب المحل: +96170257354
+- رابط التطبيق: https://play.google.com/store/apps/details?id=com.markitworld.app
 
-🛍️ البضاعة المتوفرة: ألبان، أجبان، معلبات، مواد مجمدة، حبوب، أرز، عدس، فواكه، خضار، مواد تنظيف، زيت، بهارات، بيض، مخبوزات، مشروبات.
+🛍️ البضاعة المتوفرة: ألبان، أجبان، معلبات، مجمدات، حبوب، أرز، عدس، فواكه، خضار، مواد تنظيف، زيت، بهارات، بيض، مخبوزات، مشروبات، لحوم، دجاج.
 
-💰 الأسعار: إذا سُئلت عن الأسعار، قل: "قريباً سندخل البضاعة مع الأسعار بشكل دقيق، حالياً يمكنك الاستفسار عبر واتساب +96170257354".
+🚚 التوصيل: يومياً 9ص-10م. سعر التوصيل: قريب 160,000 ل.ل، بعيد 180,000 ل.ل.
 
-🚚 **رسوم التوصيل:** المناطق القريبة (160,000 ليرة): الميناء، نقابة أطباء. المناطق البعيدة (180,000 ليرة): بداوي، قلمون، المنية، ضهر العين، بحصاص، التل، الزاهرية، القبة.
-⏰ مواعيد التوصيل: يومياً 9 صباحاً – 10 مساءً. ساعات المتجر: 8 صباحاً – 11 مساءً.
-
-📞 واتساب: +96170257354 📱 رابط التطبيق: https://play.google.com/store/apps/details?id=com.markitworld.app
-
-✨ **مميزات Markit:** إذا كان المنتج غير متوفر، يتصل بك فريق Markit فوراً ويقترح بديلاً.
-
-📱 **كيفية استخدام تطبيق Markit خطوة بخطوة:** حمّل التطبيق، أدخل رقم هاتفك، رمز التحقق عبر واتساب، فعّل GPS، أدخل عنوانك بالتفصيل.
-
-🆘 **إذا واجهت مشكلة في التطبيق:** يمكنني مساعدتك خطوة بخطوة.
-
-أسلوبك: مهذب، دافئ، تستخدم إيموجيات بسيطة، ولا تكتب أي شيفرة برمجية. إذا سألك أحد عن المناطق والأسعار، أظهر القوائم بشكل نقطي.`;
+أسلوبك: مهذب، دافئ، تستخدم إيموجيات بسيطة، ردودك واضحة ومباشرة.`;
 
     let conversationHistory = [];
     let isWaitingForResponse = false;
@@ -710,19 +819,70 @@
     let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
-
-    // Text-to-speech function
-    function speakText(text) {
-        if (window.speechSynthesis) {
-            if (speechSynthesisUtterance) window.speechSynthesis.cancel();
-            const cleanText = text.replace(/<[^>]*>/g, '');
-            speechSynthesisUtterance = new SpeechSynthesisUtterance(cleanText);
-            speechSynthesisUtterance.lang = 'ar-SA';
-            speechSynthesisUtterance.rate = 0.9;
-            window.speechSynthesis.speak(speechSynthesisUtterance);
+    
+    // دالة استدعاء API مع Fallback بين المفاتيح
+    async function callGroqWithFallback(userMessage, retryCount = 0) {
+        // إذا فشلت جميع المفاتيح سابقاً
+        if (allKeysFailed) {
+            return "حالياً أنا خارج الخدمة، إن أردت استفسار عن أي معلومة تواصل عبر واتساب +96170257354";
+        }
+        
+        if (retryCount >= apiKeysList.length) {
+            allKeysFailed = true;
+            return "حالياً أنا خارج الخدمة، إن أردت استفسار عن أي معلومة تواصل عبر واتساب +96170257354";
+        }
+        
+        const currentKey = apiKeysList[retryCount];
+        if (!currentKey || currentKey === 'gsk_placeholder_key_3_replace_me') {
+            return callGroqWithFallback(userMessage, retryCount + 1);
+        }
+        
+        let userContext = currentUser ? `المستخدم الحالي: ${currentUser.name}` : "زائر غير مسجل";
+        const messagesForAPI = [
+            { role: "system", content: SYSTEM_PROMPT + `\nمعلومات إضافية: ${userContext}` },
+            ...conversationHistory.slice(-15).map(msg => ({ role: msg.role === "user" ? "user" : "assistant", content: msg.content })),
+            { role: "user", content: userMessage }
+        ];
+        
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 20000);
+            
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${currentKey}`
+                },
+                body: JSON.stringify({ 
+                    model: "llama-3.3-70b-versatile", 
+                    messages: messagesForAPI, 
+                    temperature: 0.7, 
+                    max_tokens: 800 
+                }),
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                console.warn(`⚠️ المفتاح ${retryCount + 1} فشل (${response.status})، التبديل إلى التالي...`);
+                return callGroqWithFallback(userMessage, retryCount + 1);
+            }
+            
+            const data = await response.json();
+            if (data.choices && data.choices[0]?.message?.content) {
+                let raw = data.choices[0].message.content;
+                return raw;
+            }
+            return callGroqWithFallback(userMessage, retryCount + 1);
+            
+        } catch (error) {
+            console.error(`❌ خطأ بالمفتاح ${retryCount + 1}:`, error);
+            return callGroqWithFallback(userMessage, retryCount + 1);
         }
     }
-
+    
     function autoLinkify(text) {
         let newText = text;
         newText = newText.replace(/(https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.markitworld\.app)/g, `<a href="$1" target="_blank" style="color:#f59e0b; font-weight:bold;">📲 اضغط لتحميل تطبيق Markit</a>`);
@@ -730,89 +890,16 @@
         newText = newText.replace(/https:\/\/www\.google\.com\/maps\/[^\s]+/g, (match) => `<a href="${match}" target="_blank" style="color:#f59e0b;">🗺️ اضغط للموقع</a>`);
         return newText;
     }
-
-    function sanitizeBotReply(text) {
-        let clean = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-        clean = clean.replace(/<script[\s\S]*?<\/script>/gi, '');
-        clean = clean.replace(/`{3}[\s\S]*?`{3}/g, '');
-        return clean;
-    }
-
-    async function callGroq(userMessage) {
-        if (!apiKey) throw new Error('API_KEY_NOT_SET');
-        let userContext = currentUser ? `المستخدم الحالي: ${currentUser.name} (${currentUser.email})` : "زائر غير مسجل";
-        const messagesForAPI = [
-            { role: "system", content: SYSTEM_PROMPT + `\nمعلومات إضافية: ${userContext}` },
-            ...conversationHistory.slice(-20).map(msg => ({ role: msg.role === "user" ? "user" : "assistant", content: msg.content })),
-            { role: "user", content: userMessage }
-        ];
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000);
-            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: messagesForAPI, temperature: 0.7, max_tokens: 800 }),
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-            if (!response.ok) {
-                if (response.status === 401) throw new Error('API_KEY_INVALID');
-                throw new Error(`API_ERROR`);
-            }
-            const data = await response.json();
-            if (data.choices && data.choices[0]?.message?.content) {
-                let raw = data.choices[0].message.content;
-                raw = sanitizeBotReply(raw);
-                return autoLinkify(raw);
-            }
-            return "عذراً، حدث خطأ. تواصل عبر واتساب.";
-        } catch (err) {
-            if (err.message === 'API_KEY_NOT_SET') return "🔐 لم يتم إعداد مفتاح API بعد.";
-            if (err.message === 'API_KEY_INVALID') return "🔑 مفتاح API غير صالح.";
-            return "⚠️ خطأ في الاتصال. تواصل على واتساب.";
-        }
-    }
-
-    // WhatsApp send formatted message
-    function sendToWhatsApp(userMessage) {
-        if (!currentUser) { alert("الرجاء تسجيل الدخول أولاً لإرسال الرسالة إلى واتساب المحل."); return; }
-        const formattedMsg = `🛍️ *رسالة من عميل Cerebonix*\n👤 الاسم: ${currentUser.name}\n📧 البريد: ${currentUser.email}\n💬 الرسالة: ${userMessage}\n📱 تم الإرسال من تطبيق سوبر ماركت المصري - Markit`;
-        const encoded = encodeURIComponent(formattedMsg);
-        window.open(`https://wa.me/96170257354?text=${encoded}`, '_blank');
-        addMessageToUI(`✅ تم توجيه رسالتك إلى واتساب المحل: "${userMessage.substring(0, 50)}..." سيتم الرد عليك قريباً.`, 'assistant');
-    }
-
-    const chatWindow = document.getElementById('chatWindow');
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const themeToggle = document.getElementById('themeToggleBtn');
-    const clearChatBtn = document.getElementById('clearChatBtn');
-    const saveChatBtn = document.getElementById('saveChatBtn');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    const menuToggle = document.getElementById('menuToggleBtn');
-    const apiWarning = document.getElementById('apiWarning');
-    const settingsMenuItem = document.getElementById('settingsMenuItem');
-    const userGreetingSpan = document.getElementById('userGreetingSpan');
-    const loginLogoutBtn = document.getElementById('loginLogoutBtn');
-    const voiceBtn = document.getElementById('voiceBtn');
-
-    function updateApiWarning() { if (!apiKey) apiWarning.classList.remove('hidden'); else apiWarning.classList.add('hidden'); }
-    function updateSettingsVisibility() { if (!currentUser) settingsMenuItem.classList.add('hidden'); else settingsMenuItem.classList.remove('hidden'); }
-    function updateUserUI() {
-        if (currentUser) { userGreetingSpan.classList.remove('hidden'); userGreetingSpan.innerHTML = `👋 أهلاً ${currentUser.name.split(' ')[0]}`; loginLogoutBtn.textContent = '🚪 تسجيل خروج'; }
-        else { userGreetingSpan.classList.add('hidden'); loginLogoutBtn.textContent = '🔐 تسجيل دخول'; }
-        updateSettingsVisibility();
-    }
-
+    
     function addMessageToUI(text, role) {
+        const chatWindow = document.getElementById('chatWindow');
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${role === 'user' ? 'user-message' : 'bot-message'}`;
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        bubble.innerHTML = text.replace(/\n/g, '<br>');
+        bubble.innerHTML = autoLinkify(text.replace(/\n/g, '<br>'));
         msgDiv.appendChild(bubble);
+        
         if (role === 'assistant') {
             const plainText = text.replace(/<[^>]*>/g, '');
             const copyBtn = document.createElement('button');
@@ -827,14 +914,27 @@
             listenBtn.onclick = () => speakText(plainText);
             bubble.appendChild(listenBtn);
         }
+        
         chatWindow.appendChild(msgDiv);
         chatWindow.scrollTop = chatWindow.scrollHeight;
         if (role !== 'system') conversationHistory.push({ role: role, content: text.replace(/<[^>]*>/g, '') });
         if (conversationHistory.length > 60) conversationHistory = conversationHistory.slice(-60);
         localStorage.setItem('chat_history', JSON.stringify(conversationHistory));
     }
-
+    
+    function speakText(text) {
+        if (window.speechSynthesis) {
+            if (speechSynthesisUtterance) window.speechSynthesis.cancel();
+            const cleanText = text.replace(/<[^>]*>/g, '');
+            speechSynthesisUtterance = new SpeechSynthesisUtterance(cleanText);
+            speechSynthesisUtterance.lang = 'ar-SA';
+            speechSynthesisUtterance.rate = 0.9;
+            window.speechSynthesis.speak(speechSynthesisUtterance);
+        }
+    }
+    
     function showTyping() {
+        const chatWindow = document.getElementById('chatWindow');
         const typingDiv = document.createElement('div');
         typingDiv.className = 'message bot-message';
         typingDiv.id = 'typing-indicator';
@@ -842,58 +942,54 @@
         chatWindow.appendChild(typingDiv);
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
-    function removeTyping() { const el = document.getElementById('typing-indicator'); if(el) el.remove(); }
-
+    
+    function removeTyping() { 
+        const el = document.getElementById('typing-indicator'); 
+        if(el) el.remove(); 
+    }
+    
     async function sendUserMessage(text = null) {
         if (isWaitingForResponse) return;
-        let message = text || messageInput.value.trim();
+        let message = text || document.getElementById('messageInput').value.trim();
         if (!message) return;
         if (!text) {
-            messageInput.value = '';
-            messageInput.blur();
+            document.getElementById('messageInput').value = '';
         }
+        
         addMessageToUI(message, 'user');
-        
-        if (message.includes("واتساب") && (message.includes("ارسل") || message.includes("أرسل"))) {
-            sendToWhatsApp(message);
-            isWaitingForResponse = false;
-            return;
-        }
-        
         isWaitingForResponse = true;
-        sendBtn.disabled = true;
-        voiceBtn.disabled = true;
+        document.getElementById('sendBtn').disabled = true;
+        document.getElementById('voiceBtn').disabled = true;
         
-        // 1. محاولة الإجابة الجاهزة أولاً
+        // 1. البحث عن إجابة جاهزة
         let localAnswer = getLocalAnswer(message);
         if (localAnswer) {
-            // تأخير بسيط لمحاكاة التفكير (0.7 ثانية) قبل الرد
             showTyping();
-            await new Promise(resolve => setTimeout(resolve, 700));
+            await new Promise(resolve => setTimeout(resolve, 500));
             removeTyping();
-            addMessageToUI(autoLinkify(localAnswer), 'assistant');
+            addMessageToUI(localAnswer, 'assistant');
             isWaitingForResponse = false;
-            sendBtn.disabled = false;
-            voiceBtn.disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('voiceBtn').disabled = false;
             return;
         }
         
-        // 2. إذا لم يجد إجابة جاهزة، يتجه إلى API
+        // 2. استخدام API مع نظام Fallback
         showTyping();
         try {
-            const reply = await callGroq(message);
+            const reply = await callGroqWithFallback(message, 0);
             removeTyping();
             addMessageToUI(reply, 'assistant');
         } catch (err) {
             removeTyping();
-            addMessageToUI("🙏 عذراً، حدث خطأ. لكن يمكنك مراسلتنا عبر واتساب +96170257354.", 'assistant');
+            addMessageToUI("حالياً أنا خارج الخدمة، إن أردت استفسار عن أي معلومة تواصل عبر واتساب +96170257354", 'assistant');
         } finally {
             isWaitingForResponse = false;
-            sendBtn.disabled = false;
-            voiceBtn.disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('voiceBtn').disabled = false;
         }
     }
-
+    
     // Voice Recording
     async function startRecording() {
         if (isRecording) return;
@@ -906,62 +1002,98 @@
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 const reader = new FileReader();
                 reader.onloadend = async () => {
-                    const base64data = reader.result.split(',')[1];
                     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
                     recognition.lang = 'ar-LB';
                     recognition.interimResults = false;
-                    recognition.maxAlternatives = 1;
                     recognition.start();
                     recognition.onresult = (event) => {
                         const transcript = event.results[0][0].transcript;
-                        messageInput.value = transcript;
+                        document.getElementById('messageInput').value = transcript;
                         sendUserMessage(transcript);
                     };
-                    recognition.onerror = () => { alert("لم يتم التعرف على الصوت، حاول مجدداً"); };
+                    recognition.onerror = () => { alert("لم يتم التعرف على الصوت"); };
                 };
                 reader.readAsDataURL(audioBlob);
                 stream.getTracks().forEach(track => track.stop());
             };
             mediaRecorder.start();
             isRecording = true;
+            const voiceBtn = document.getElementById('voiceBtn');
             voiceBtn.style.background = "#ef4444";
             voiceBtn.innerHTML = "⏹️";
             setTimeout(() => { if (isRecording) stopRecording(); }, 10000);
-        } catch (err) { alert("الجهاز لا يدعم التسجيل الصوتي أو لم يُمنح الإذن"); }
+        } catch (err) { alert("الجهاز لا يدعم التسجيل الصوتي"); }
     }
+    
     function stopRecording() {
         if (mediaRecorder && isRecording) {
             mediaRecorder.stop();
             isRecording = false;
+            const voiceBtn = document.getElementById('voiceBtn');
             voiceBtn.style.background = "#3b82f6";
             voiceBtn.innerHTML = "🎤";
         }
     }
-    voiceBtn.addEventListener('click', () => { if (isRecording) stopRecording(); else startRecording(); });
-
+    
     function loadWelcomeMessage() {
-        chatWindow.innerHTML = `<div class="message bot-message"><div class="bubble">🚀✨ أهلاً بك في <strong>Cerebonix AI Pro</strong> – أذكى مساعد لـ <strong>سوبر ماركت المصري</strong> وخدمة <strong>Markit</strong>!<br><br>⚡ <strong>Cerebonix - أسرع 20 مرة</strong><br>📦 عندنا: ألبان، لحوم، خضار، فواكه، معلبات، مواد تنظيف، وكل احتياجاتك 🛍️<br>💰 الأسعار: قريباً سندخل البضاعة مع الأسعار بالكامل!<br>📍 <strong>عنوان المتجر على الخريطة:</strong> <a href="https://www.google.com/maps?q=34.4367,35.8343" target="_blank" style="color:#f59e0b;">🗺️ اضغط للموقع (الميناء - جامع السلام)</a><br>📞 <a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b;">واتساب +96170257354</a><br>اسألني عن أي شي، أنا صنع <strong>محمد حلاق</strong> 🙌</div></div>`;
+        const chatWindow = document.getElementById('chatWindow');
+        chatWindow.innerHTML = `<div class="message bot-message"><div class="bubble">🚀✨ أهلاً بك في <strong>Cerebonix AI Pro</strong> – أذكى مساعد لـ <strong>سوبر ماركت المصري</strong> وخدمة <strong>Markit</strong>!<br><br>⚡ <strong>نظام تشغيل ب 3 مفاتيح احتياطية</strong> - لو تعطل مفتاح يشتغل الثاني تلقائياً<br>📦 عندنا: ألبان، لحوم، خضار، فواكه، معلبات، وكل احتياجاتك 🛍️<br>📍 <strong>عنوان المتجر:</strong> <a href="https://www.google.com/maps?q=34.4367,35.8343" target="_blank" style="color:#f59e0b;">🗺️ الميناء - جامع السلام</a><br>📞 <a href="https://wa.me/96170257354" target="_blank" style="color:#f59e0b;">واتساب +96170257354</a><br>❓ جرب تسأل: <strong>"بدي طلبية على القبة"</strong> وشوف كيف بفهم السياق!<br>اسألني عن أي شي، أنا صنع <strong>محمد حلاق</strong> 🙌</div></div>`;
     }
-
-    function clearChat() { if(confirm('مسح المحادثة؟')) { conversationHistory = []; loadWelcomeMessage(); localStorage.removeItem('chat_history'); } }
-    function saveChat() { if(conversationHistory.length===0) return alert('لا توجد محادثة'); const text = conversationHistory.map(m=>`${m.role==='user'?'👤':'🤖'}: ${m.content}`).join('\n\n'); const blob = new Blob([text], {type:'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `cerebonix_${Date.now()}.txt`; a.click(); URL.revokeObjectURL(a.href); }
-    function loadSavedChat() { const saved = localStorage.getItem('chat_history'); if(saved && JSON.parse(saved).length) { conversationHistory = JSON.parse(saved); chatWindow.innerHTML = ''; conversationHistory.forEach(msg => addMessageToUI(msg.content, msg.role)); } else loadWelcomeMessage(); }
+    
+    function clearChat() { 
+        if(confirm('مسح المحادثة؟')) { 
+            conversationHistory = []; 
+            loadWelcomeMessage(); 
+            localStorage.removeItem('chat_history'); 
+        } 
+    }
+    
+    function saveChat() { 
+        if(conversationHistory.length===0) return alert('لا توجد محادثة'); 
+        const text = conversationHistory.map(m=>`${m.role==='user'?'👤':'🤖'}: ${m.content}`).join('\n\n'); 
+        const blob = new Blob([text], {type:'text/plain'}); 
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = `cerebonix_${Date.now()}.txt`; 
+        a.click(); 
+        URL.revokeObjectURL(a.href); 
+    }
+    
+    function loadSavedChat() { 
+        const saved = localStorage.getItem('chat_history'); 
+        if(saved && JSON.parse(saved).length) { 
+            conversationHistory = JSON.parse(saved); 
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.innerHTML = ''; 
+            conversationHistory.forEach(msg => addMessageToUI(msg.content, msg.role)); 
+        } else loadWelcomeMessage(); 
+    }
     
     function switchTab(tabId) {
         document.getElementById('chatWindow').classList.add('hidden');
         document.getElementById('infoPanel').classList.add('hidden');
         document.getElementById('settingsPanel').classList.add('hidden');
+        document.getElementById('faqPanel').classList.add('hidden');
         if(tabId==='info') document.getElementById('infoPanel').classList.remove('hidden');
         else if(tabId==='settings') document.getElementById('settingsPanel').classList.remove('hidden');
+        else if(tabId==='faq') document.getElementById('faqPanel').classList.remove('hidden');
         else document.getElementById('chatWindow').classList.remove('hidden');
+        
         document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
         const active = Array.from(document.querySelectorAll('.menu-item')).find(el=>el.dataset.tab===tabId);
         if(active) active.classList.add('active');
-        if(window.innerWidth<=780) { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+        
+        if(window.innerWidth<=780) { 
+            document.getElementById('sidebar').classList.remove('open'); 
+            document.getElementById('overlay').classList.remove('open'); 
+        }
     }
-
-    function toggleTheme() { document.body.classList.toggle('dark'); localStorage.setItem('cerebonix_theme', document.body.classList.contains('dark')?'dark':'light'); }
-
+    
+    function toggleTheme() { 
+        document.body.classList.toggle('dark'); 
+        localStorage.setItem('cerebonix_theme', document.body.classList.contains('dark')?'dark':'light'); 
+    }
+    
     function handleLogin() {
         if(currentUser) {
             currentUser = null;
@@ -980,47 +1112,107 @@
             localStorage.setItem('cerebonix_user', JSON.stringify(currentUser));
             updateUserUI();
             alert(`مرحباً ${currentUser.name}!`);
-            addMessageToUI(`🎉 مرحباً ${currentUser.name}، سعيد برؤيتك! كيف يمكنني مساعدتك اليوم؟`, 'assistant');
+            addMessageToUI(`🎉 مرحباً ${currentUser.name}، سعيد برؤيتك!`, 'assistant');
         }
     }
-
-    function setupApiSettings() {
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
-        const testApiBtn = document.getElementById('testApiBtn');
-        const apiStatus = document.getElementById('apiStatus');
-        if(apiKey) apiKeyInput.value = '••••••••••••••••••••••';
-        saveApiKeyBtn.onclick = () => {
-            const newKey = prompt('أدخل مفتاح Groq API:', apiKey || '');
-            if(newKey && newKey.trim()) { apiKey = newKey.trim(); localStorage.setItem('groq_api_key', apiKey); apiKeyInput.value = '••••••••••••'; apiStatus.innerHTML = '<span style="color:#22c55e;">✅ تم حفظ المفتاح</span>'; updateApiWarning(); setTimeout(()=>apiStatus.innerHTML='',2500); }
-        };
-        testApiBtn.onclick = async () => {
-            if(!apiKey) { apiStatus.innerHTML='<span style="color:#ef4444;">❌ لا يوجد مفتاح</span>'; return; }
-            apiStatus.innerHTML='<span style="color:#f59e0b;">⏳ جاري الاختبار...</span>';
-            try {
-                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`}, body:JSON.stringify({model:'llama-3.3-70b-versatile', messages:[{role:'user',content:'Hi'}], max_tokens:5}) });
-                if(res.ok) apiStatus.innerHTML='<span style="color:#22c55e;">✅ Groq يعمل بسرعة!</span>';
-                else apiStatus.innerHTML='<span style="color:#ef4444;">❌ فشل الاتصال</span>';
-            } catch(e) { apiStatus.innerHTML='<span style="color:#ef4444;">❌ خطأ</span>'; }
-        };
+    
+    function updateUserUI() {
+        const userGreetingSpan = document.getElementById('userGreetingSpan');
+        const loginLogoutBtn = document.getElementById('loginLogoutBtn');
+        const settingsMenuItem = document.getElementById('settingsMenuItem');
+        if (currentUser) { 
+            userGreetingSpan.classList.remove('hidden'); 
+            userGreetingSpan.innerHTML = `👋 أهلاً ${currentUser.name.split(' ')[0]}`; 
+            loginLogoutBtn.textContent = '🚪 تسجيل خروج'; 
+        } else { 
+            userGreetingSpan.classList.add('hidden'); 
+            loginLogoutBtn.textContent = '🔐 تسجيل دخول'; 
+        }
+        if (settingsMenuItem) {
+            if (!currentUser) settingsMenuItem.classList.add('hidden'); 
+            else settingsMenuItem.classList.remove('hidden');
+        }
     }
-
-    document.querySelectorAll('.menu-item').forEach(i=>i.addEventListener('click',()=>{ if(i.dataset.tab === 'settings' && !currentUser) { alert('يرجى تسجيل الدخول أولاً للوصول إلى إعدادات API.'); return; } switchTab(i.dataset.tab); }));
-    sendBtn.addEventListener('click',()=>sendUserMessage());
-    messageInput.addEventListener('keypress',(e)=> { if(e.key==='Enter' && !isWaitingForResponse) sendUserMessage(); });
-    themeToggle.addEventListener('click',toggleTheme);
-    clearChatBtn.addEventListener('click',clearChat);
-    saveChatBtn.addEventListener('click',saveChat);
-    menuToggle?.addEventListener('click',()=>{ sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
-    overlay?.addEventListener('click',()=>{ sidebar.classList.remove('open'); overlay.classList.remove('open'); });
-    document.querySelectorAll('.quick-chip').forEach(chip=>chip.addEventListener('click',()=>sendUserMessage(chip.dataset.question)));
-    loginLogoutBtn.addEventListener('click', handleLogin);
-
+    
+    async function testAllKeys() {
+        const statusDiv = document.getElementById('apiStatus');
+        statusDiv.innerHTML = "⏳ جاري اختبار جميع المفاتيح...";
+        let results = [];
+        for (let i = 0; i < apiKeysList.length; i++) {
+            const key = apiKeysList[i];
+            if (!key || key === 'gsk_placeholder_key_3_replace_me') {
+                results.push(`❌ المفتاح ${i+1}: غير صالح (placeholder)`);
+                continue;
+            }
+            try {
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+                    body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{role:'user', content:'Hi'}], max_tokens: 5 })
+                });
+                if (res.ok) {
+                    results.push(`✅ المفتاح ${i+1}: يعمل بشكل جيد`);
+                } else {
+                    results.push(`❌ المفتاح ${i+1}: فشل (${res.status})`);
+                }
+            } catch(e) {
+                results.push(`❌ المفتاح ${i+1}: خطأ في الاتصال`);
+            }
+        }
+        statusDiv.innerHTML = results.join('<br>');
+        allKeysFailed = false;
+    }
+    
+    // Event Listeners
+    document.getElementById('sendBtn').addEventListener('click', () => sendUserMessage());
+    document.getElementById('messageInput').addEventListener('keypress', (e) => { if(e.key==='Enter' && !isWaitingForResponse) sendUserMessage(); });
+    document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+    document.getElementById('clearChatBtn').addEventListener('click', clearChat);
+    document.getElementById('saveChatBtn').addEventListener('click', saveChat);
+    document.getElementById('menuToggleBtn').addEventListener('click', () => { 
+        document.getElementById('sidebar').classList.toggle('open'); 
+        document.getElementById('overlay').classList.toggle('open'); 
+    });
+    document.getElementById('overlay').addEventListener('click', () => { 
+        document.getElementById('sidebar').classList.remove('open'); 
+        document.getElementById('overlay').classList.remove('open'); 
+    });
+    document.getElementById('loginLogoutBtn').addEventListener('click', handleLogin);
+    document.getElementById('voiceBtn').addEventListener('click', () => { if (isRecording) stopRecording(); else startRecording(); });
+    document.getElementById('testAllKeysBtn').addEventListener('click', testAllKeys);
+    document.getElementById('addKeyBtn').addEventListener('click', addNewKey);
+    
+    document.querySelectorAll('.menu-item').forEach(i => {
+        i.addEventListener('click', () => { 
+            if(i.dataset.tab === 'settings' && !currentUser) { 
+                alert('يرجى تسجيل الدخول أولاً للوصول إلى إعدادات API.'); 
+                return; 
+            } 
+            switchTab(i.dataset.tab); 
+        });
+    });
+    
+    document.querySelectorAll('.quick-chip, .faq-question').forEach(el => {
+        el.addEventListener('click', () => {
+            const question = el.dataset.question;
+            if (question) {
+                switchTab('chat');
+                setTimeout(() => sendUserMessage(question), 100);
+            }
+        });
+    });
+    
+    // Load saved theme
     const savedTheme = localStorage.getItem('cerebonix_theme');
-    if(savedTheme==='dark') document.body.classList.add('dark');
+    if(savedTheme === 'dark') document.body.classList.add('dark');
+    
+    // Load API keys from storage
+    loadApiKeys();
+    
+    // Load saved chat
     loadSavedChat();
-    setupApiSettings();
-    updateApiWarning();
+    
+    // Update UI
     updateUserUI();
     if(currentUser) addMessageToUI(`👋 مرحباً بعودتك ${currentUser.name}!`, 'assistant');
 </script>
